@@ -1,0 +1,7 @@
+node_modules
+# Keep environment variables out of version control
+.env
+
+/generated/prisma
+
+DATABASE_URL="postgresql://bikerentaldb_owner:npg_cH4Arjx1mhKe@ep-wandering-leaf-a1gekkf4-pooler.ap-southeast-1.aws.neon.tech/bikerentaldb?sslmode=require"
