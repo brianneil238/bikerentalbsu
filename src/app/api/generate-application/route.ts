@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { promises as fs } from 'fs';
 import path from 'path';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
 // These imports are for DOCX templating and conversion
@@ -93,13 +93,8 @@ export async function POST(req: Request) {
     await fs.mkdir(pdfDirPath, { recursive: true }); // Ensure directory exists
     await fs.writeFile(pdfFilePath, pdfBuffer);
 
-    // 6. Store reference in PostgreSQL database
-    await prisma.generatedApplication.create({
-      data: {
-        userId: session.user.id,
-        pdfUrl,
-      },
-    });
+    // 6. Store reference in PostgreSQL database (disabled for now)
+    // Note: Using BikeRentalApplication model instead for the new implementation
 
     return NextResponse.json({
       message: 'PDF generated and saved successfully!',
