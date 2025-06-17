@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
-import { Bike, MapProps } from '@/types';
+import { Bike, MapProps } from '@/types/index';
 
 export default function Map({ bikes, selectedBike, onBikeSelect }: MapProps) {
   const mapRef = useRef<HTMLDivElement>(null);

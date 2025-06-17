@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { formatDistanceToNow } from 'date-fns';
-import { Rental, Bike } from '@/types';
+import { Bike } from '@/types/index';
 
 const Map = dynamic(() => import('@/components/Map'), {
   ssr: false,
