@@ -18,15 +18,7 @@ interface Rental {
   id: string;
   startTime: string;
   status: 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
-  bike: {
-    id: string;
-    bikeNumber: string;
-    model: string;
-    currentLocation: {
-      lat: number;
-      lng: number;
-    } | null;
-  };
+  bike: Bike;
   distance: number | null;
   carbonSaved: number | null;
 }
@@ -161,10 +153,7 @@ export default function ActiveRentalPage() {
               <div className="h-[300px] rounded-lg overflow-hidden">
                 {rental.bike.currentLocation && (
                   <Map
-                    bikes={[{
-                      ...rental.bike,
-                      status: 'ACTIVE'
-                    }]}
+                    bikes={[rental.bike]}
                     selectedBike={rental.bike}
                     onBikeSelect={() => {}}
                   />
