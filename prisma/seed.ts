@@ -1,9 +1,34 @@
 import { PrismaClient } from '../generated/prisma';
+import { hash } from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Starting database seeding...');
+
+  // Create a test user
+  console.log('👤 Creating test user...');
+  const testUserEmail = 'test@bsu.edu.ph';
+  
+  const existingUser = await prisma.user.findUnique({
+    where: { email: testUserEmail },
+  });
+
+  if (!existingUser) {
+    const hashedPassword = await hash('password123', 12);
+    
+    await prisma.user.create({
+      data: {
+        email: testUserEmail,
+        name: 'Test User',
+        password: hashedPassword,
+        role: 'STUDENT',
+      },
+    });
+    console.log('✅ Created test user: test@bsu.edu.ph (password: password123)');
+  } else {
+    console.log('⏭️ Test user already exists, skipping...');
+  }
 
   // Create some sample bikes
   const bikes = [
