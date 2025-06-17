@@ -1,9 +1,5 @@
 {
-  "/rent/page": "app/rent/page.js",
+  "/page": "app/page.js",
   "/api/bikes/route": "app/api/bikes/route.js",
-  "/api/applications/route": "app/api/applications/route.js",
-  "/api/pdf/route": "app/api/pdf/route.js",
-  "/api/generate-pdf/route": "app/api/generate-pdf/route.js",
-  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
-  "/page": "app/page.js"
+  "/rent/page": "app/rent/page.js"
 }

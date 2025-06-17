@@ -12,7 +12,8 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
-    "db:reset": "prisma migrate reset"
+    "db:reset": "prisma migrate reset",
+    "db:seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^1.16.2",
@@ -43,6 +44,7 @@
     "eslint-config-next": "14.1.0",
     "postcss": "^8.4.35",
     "prisma": "^5.10.2",
+    "tsx": "^4.20.3",
     "typescript": "^5.3.3"
   }
 }
