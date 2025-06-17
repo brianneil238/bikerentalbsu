@@ -1,9 +1,9 @@
 {
-  "/api/bikes/route": "app/api/bikes/route.js",
-  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
   "/page": "app/page.js",
   "/(auth)/login/page": "app/(auth)/login/page.js",
-  "/(auth)/register/page": "app/(auth)/register/page.js",
   "/rent/page": "app/rent/page.js",
-  "/api/auth/register/route": "app/api/auth/register/route.js"
+  "/(auth)/register/page": "app/(auth)/register/page.js",
+  "/api/bikes/route": "app/api/bikes/route.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/api/pdf/route": "app/api/pdf/route.js"
 }

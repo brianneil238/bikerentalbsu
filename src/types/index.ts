@@ -18,6 +18,7 @@ export interface Rental {
   bike: Bike;
   distance: number | null;
   carbonSaved: number | null;
+  pdfUrl: string | null;
 }
 
 export interface MapProps {

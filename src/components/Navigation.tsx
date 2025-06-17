@@ -20,12 +20,12 @@ export function Navigation() {
   ];
 
   return (
-    <nav className="bg-white shadow-md">
+    <nav className="bg-white shadow-lg border-b border-green-100">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/" className="text-xl font-bold text-green-600">
-            BikeShare
+          <Link href="/" className="text-xl font-bold text-green-700 hover:text-green-800 transition-colors">
+            🚲 BikeShare
           </Link>
 
           {/* Desktop Navigation */}
@@ -36,9 +36,9 @@ export function Navigation() {
                 href={item.href}
                 className={`${
                   isActive(item.href)
-                    ? 'text-green-600'
-                    : 'text-gray-600 hover:text-green-600'
-                } transition-colors`}
+                    ? 'text-green-700 font-semibold'
+                    : 'text-gray-600 hover:text-green-700'
+                } transition-colors duration-200`}
               >
                 {item.label}
               </Link>
@@ -51,13 +51,13 @@ export function Navigation() {
               <>
                 <Link
                   href="/login"
-                  className="text-gray-600 hover:text-green-600 transition-colors"
+                  className="text-gray-600 hover:text-green-700 transition-colors duration-200"
                 >
                   Login
                 </Link>
                 <Link
                   href="/register"
-                  className="bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700 transition-colors"
+                  className="btn-primary"
                 >
                   Register
                 </Link>
@@ -66,7 +66,7 @@ export function Navigation() {
             {status === 'authenticated' && (
               <button
                 onClick={() => signOut({ callbackUrl: '/' })}
-                className="bg-red-600 text-white px-4 py-2 rounded-full hover:bg-red-700 transition-colors"
+                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors duration-200"
               >
                 Logout
               </button>
@@ -75,7 +75,7 @@ export function Navigation() {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden"
+            className="md:hidden text-green-700 hover:text-green-800 transition-colors"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
           >
@@ -99,16 +99,16 @@ export function Navigation() {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden py-4">
+          <div className="md:hidden py-4 border-t border-green-100">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 className={`block py-2 ${
                   isActive(item.href)
-                    ? 'text-green-600'
-                    : 'text-gray-600 hover:text-green-600'
-                } transition-colors`}
+                    ? 'text-green-700 font-semibold'
+                    : 'text-gray-600 hover:text-green-700'
+                } transition-colors duration-200`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 {item.label}
@@ -119,14 +119,14 @@ export function Navigation() {
                 <>
                   <Link
                     href="/login"
-                    className="block text-gray-600 hover:text-green-600 transition-colors"
+                    className="block text-gray-600 hover:text-green-700 transition-colors duration-200"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Login
                   </Link>
                   <Link
                     href="/register"
-                    className="block bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700 transition-colors text-center"
+                    className="block btn-primary text-center"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Register
@@ -139,7 +139,7 @@ export function Navigation() {
                     signOut({ callbackUrl: '/' });
                     setIsMenuOpen(false);
                   }}
-                  className="block bg-red-600 text-white px-4 py-2 rounded-full hover:bg-red-700 transition-colors text-center"
+                  className="block bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors duration-200 text-center w-full"
                 >
                   Logout
                 </button>

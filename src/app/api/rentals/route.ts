@@ -47,7 +47,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const { bikeId } = await req.json();
+    const { bikeId, pdfUrl } = await req.json();
 
     // Check if user has an active rental
     const activeRental = await prisma.rental.findFirst({
@@ -83,6 +83,7 @@ export async function POST(req: Request) {
           userId: session.user.id,
           bikeId,
           status: 'ACTIVE',
+          pdfUrl: pdfUrl || null,
         },
         include: {
           bike: true,

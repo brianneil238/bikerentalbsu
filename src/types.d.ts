@@ -5,3 +5,5 @@ declare global {
     google: typeof google;
   }
 } 
+
+declare module '@types/google.maps'; 

@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -14,25 +8,166 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// User model with role-based access
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
-  password      String
-  role          String    @default("USER")
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
+  useIid                    String              @id @default(cuid())
+  name                      String?
+  email                     String              @unique
+  emailVerified             DateTime?
+  image                     String?
+  password                  String
+  role                      UserRole            @default(STUDENT)
+  createdAt                 DateTime            @default(now())
+  updatedAt                 DateTime            @updatedAt
+  
   // Relations
-  rentals       Rental[]
-  maintenance   MaintenanceRecord[]
-  notifications Notification[]
-  generatedApplications GeneratedApplication[]
+  applications              BikeRentalApplication[]
+  maintenance               MaintenanceRecord[]
+  notifications             Notification[]
+  rentals                   Rental[]
 
   @@map("users")
+}
+
+// Bike Rental Application Form
+model BikeRentalApplication {
+  id                        String              @id @default(cuid())
+  userId                    String
+  
+  // Personal Information
+  firstName                 String
+  lastName                  String
+  middleName                String?
+  srCode                    String
+  sex                       String
+  dateOfBirth               DateTime
+  phoneNumber               String
+  email                     String
+  
+  // Academic Information  
+  collegeProgram            String
+  gwaLastSemester           Float?
+  extracurricularActivities String?
+  
+  // Address Information
+  houseNo                   String
+  streetName                String
+  barangay                  String
+  municipalityCity          String
+  province                  String
+  distanceFromCampus        String
+  
+  // Financial & Usage Information
+  monthlyFamilyIncome       Float?
+  durationOfUse             String
+  
+  // Application Status
+  status                    ApplicationStatus   @default(PENDING)
+  submittedAt               DateTime            @default(now())
+  reviewedAt                DateTime?
+  reviewedBy                String?
+  notes                     String?
+  
+  // Relations
+  user                      User                @relation(fields: [userId], references: [useIid])
+  
+  @@map("bike_rental_applications")
+}
+
+model Bike {
+  id              String              @id @default(cuid())
+  bikeNumber      String              @unique
+  status          BikeStatus          @default(AVAILABLE)
+  model           String
+  lastMaintenance DateTime?
+  purchaseDate    DateTime
+  currentLocation Json?
+  isActive        Boolean             @default(true)
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  locationHistory LocationHistory[]
+  maintenance     MaintenanceRecord[]
+  rentals         Rental[]
+
+  @@map("bikes")
+}
+
+model Rental {
+  id              String            @id @default(cuid())
+  userId          String
+  bikeId          String
+  startTime       DateTime          @default(now())
+  endTime         DateTime?
+  status          RentalStatus      @default(ACTIVE)
+  distance        Float?
+  carbonSaved     Float?
+  totalCost       Float?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  pdfUrl          String?
+  locationHistory LocationHistory[]
+  bike            Bike              @relation(fields: [bikeId], references: [id])
+  user            User              @relation(fields: [userId], references: [useIid])
+
+  @@map("rentals")
+}
+
+model MaintenanceRecord {
+  id          String            @id @default(cuid())
+  bikeId      String
+  userId      String
+  type        MaintenanceType
+  description String
+  cost        Float?
+  startDate   DateTime          @default(now())
+  endDate     DateTime?
+  status      MaintenanceStatus @default(PENDING)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  bike        Bike              @relation(fields: [bikeId], references: [id])
+  user        User              @relation(fields: [userId], references: [useIid])
+
+  @@map("maintenance_records")
+}
+
+model LocationHistory {
+  id        String   @id @default(cuid())
+  bikeId    String
+  rentalId  String?
+  latitude  Float
+  longitude Float
+  timestamp DateTime @default(now())
+  zone      String?
+  bike      Bike     @relation(fields: [bikeId], references: [id])
+  rental    Rental?  @relation(fields: [rentalId], references: [id])
+
+  @@map("location_history")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  message   String
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [useIid])
+
+  @@map("notifications")
+}
+
+model Analytics {
+  id               String   @id @default(cuid())
+  date             DateTime @default(now())
+  totalRides       Int
+  totalDistance    Float
+  totalCarbonSaved Float
+  activeUsers      Int
+  bikeUtilization  Float
+  maintenanceCount Int
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@map("analytics")
 }
 
 enum UserRole {
@@ -42,80 +177,17 @@ enum UserRole {
   ADMIN
 }
 
-// Bike model for fleet management
-model Bike {
-  id              String    @id @default(cuid())
-  bikeNumber      String    @unique
-  status          BikeStatus @default(AVAILABLE)
-  model           String
-  lastMaintenance DateTime?
-  purchaseDate    DateTime
-  currentLocation Json?     // Stores { lat: number, lng: number }
-  isActive        Boolean   @default(true)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-
-  // Relations
-  rentals         Rental[]
-  maintenance     MaintenanceRecord[]
-  locationHistory LocationHistory[]
-
-  @@map("bikes")
-}
-
 enum BikeStatus {
   AVAILABLE
   IN_USE
   MAINTENANCE
-}
-
-// Rental transactions
-model Rental {
-  id            String    @id @default(cuid())
-  userId        String
-  bikeId        String
-  startTime     DateTime  @default(now())
-  endTime       DateTime?
-  status        RentalStatus @default(ACTIVE)
-  distance      Float?    // in kilometers
-  carbonSaved   Float?    // in kg of CO2
-  totalCost     Float?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  // Relations
-  user          User      @relation(fields: [userId], references: [id])
-  bike          Bike      @relation(fields: [bikeId], references: [id])
-  locationHistory LocationHistory[]
-
-  @@map("rentals")
+  RENTED
 }
 
 enum RentalStatus {
   ACTIVE
   COMPLETED
   CANCELLED
-}
-
-// Maintenance records
-model MaintenanceRecord {
-  id          String    @id @default(cuid())
-  bikeId      String
-  userId      String    // Staff who performed maintenance
-  type        MaintenanceType
-  description String
-  cost        Float?
-  startDate   DateTime  @default(now())
-  endDate     DateTime?
-  status      MaintenanceStatus @default(PENDING)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  // Relations
-  bike        Bike      @relation(fields: [bikeId], references: [id])
-  user        User      @relation(fields: [userId], references: [id])
-
-  @@map("maintenance_records")
 }
 
 enum MaintenanceType {
@@ -132,38 +204,6 @@ enum MaintenanceStatus {
   CANCELLED
 }
 
-// Location tracking history
-model LocationHistory {
-  id        String   @id @default(cuid())
-  bikeId    String
-  rentalId  String?
-  latitude  Float
-  longitude Float
-  timestamp DateTime @default(now())
-  zone      String?  // For zone violation tracking
-
-  // Relations
-  bike      Bike     @relation(fields: [bikeId], references: [id])
-  rental    Rental?  @relation(fields: [rentalId], references: [id])
-
-  @@map("location_history")
-}
-
-// Notifications system
-model Notification {
-  id        String   @id @default(cuid())
-  userId    String
-  type      NotificationType
-  message   String
-  isRead    Boolean  @default(false)
-  createdAt DateTime @default(now())
-
-  // Relations
-  user      User     @relation(fields: [userId], references: [id])
-
-  @@map("notifications")
-}
-
 enum NotificationType {
   MAINTENANCE_REQUIRED
   ZONE_VIOLATION
@@ -171,29 +211,9 @@ enum NotificationType {
   SYSTEM_ALERT
 }
 
-// Analytics and reporting
-model Analytics {
-  id              String   @id @default(cuid())
-  date            DateTime @default(now())
-  totalRides      Int
-  totalDistance   Float    // in kilometers
-  totalCarbonSaved Float   // in kg of CO2
-  activeUsers     Int
-  bikeUtilization Float    // percentage
-  maintenanceCount Int
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  @@map("analytics")
-}
-
-// New model for generated application PDFs
-model GeneratedApplication {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  pdfUrl    String   // Stores the URL or path to the generated PDF
-  createdAt DateTime @default(now())
-
-  @@map("generated_applications")
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  UNDER_REVIEW
 }
