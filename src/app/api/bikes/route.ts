@@ -5,15 +5,20 @@ import { authOptions } from '@/lib/auth';
 
 export async function GET() {
   try {
+    console.log('🔍 Bikes API: Starting request...');
+    
     const session = await getServerSession(authOptions);
+    console.log('🔍 Bikes API: Session:', session ? 'Found' : 'Not found');
 
     if (!session) {
+      console.log('❌ Bikes API: No session found, returning 401');
       return NextResponse.json(
         { message: 'Unauthorized' },
         { status: 401 }
       );
     }
 
+    console.log('🔍 Bikes API: Fetching bikes from database...');
     const bikes = await prisma.bike.findMany({
       select: {
         id: true,
@@ -24,11 +29,17 @@ export async function GET() {
       },
     });
 
+    console.log(`✅ Bikes API: Found ${bikes.length} bikes`);
     return NextResponse.json(bikes);
   } catch (error) {
-    console.error('Error fetching bikes:', error);
+    console.error('❌ Bikes API Error:', error);
+    console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     return NextResponse.json(
-      { message: 'Error fetching bikes' },
+      { 
+        message: 'Error fetching bikes',
+        error: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString()
+      },
       { status: 500 }
     );
   }

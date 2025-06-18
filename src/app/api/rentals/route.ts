@@ -38,18 +38,26 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
+    console.log('🔍 Rentals API: Starting rental request...');
+    
     const session = await getServerSession(authOptions);
+    console.log('🔍 Rentals API: Session:', session ? 'Found' : 'Not found');
+    console.log('🔍 Rentals API: User ID:', session?.user?.id);
 
     if (!session) {
+      console.log('❌ Rentals API: No session found, returning 401');
       return NextResponse.json(
         { message: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    const { bikeId, pdfUrl } = await req.json();
+    const requestBody = await req.json();
+    console.log('🔍 Rentals API: Request body:', requestBody);
+    const { bikeId, pdfUrl } = requestBody;
 
     // Check if user has an active rental
+    console.log('🔍 Rentals API: Checking for active rentals...');
     const activeRental = await prisma.rental.findFirst({
       where: {
         userId: session.user.id,
@@ -58,6 +66,7 @@ export async function POST(req: Request) {
     });
 
     if (activeRental) {
+      console.log('❌ Rentals API: User already has active rental');
       return NextResponse.json(
         { message: 'You already have an active rental' },
         { status: 400 }
@@ -65,11 +74,15 @@ export async function POST(req: Request) {
     }
 
     // Check if bike is available
+    console.log('🔍 Rentals API: Checking bike availability for ID:', bikeId);
     const bike = await prisma.bike.findUnique({
       where: { id: bikeId },
     });
 
+    console.log('🔍 Rentals API: Bike found:', bike ? `${bike.bikeNumber} (${bike.status})` : 'Not found');
+
     if (!bike || bike.status !== 'AVAILABLE') {
+      console.log('❌ Rentals API: Bike not available');
       return NextResponse.json(
         { message: 'Bike is not available' },
         { status: 400 }
@@ -77,6 +90,7 @@ export async function POST(req: Request) {
     }
 
     // Create rental and update bike status in a transaction
+    console.log('🔍 Rentals API: Creating rental...');
     const rental = await prisma.$transaction(async (tx) => {
       const rental = await tx.rental.create({
         data: {
@@ -98,11 +112,18 @@ export async function POST(req: Request) {
       return rental;
     });
 
+    console.log('✅ Rentals API: Rental created successfully:', rental.id);
     return NextResponse.json(rental, { status: 201 });
   } catch (error) {
-    console.error('Error creating rental:', error);
+    console.error('❌ Rentals API Error:', error);
+    console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    console.error('❌ Error details:', error instanceof Error ? error.message : 'Unknown error');
     return NextResponse.json(
-      { message: 'Error creating rental' },
+      { 
+        message: 'Error creating rental',
+        error: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString()
+      },
       { status: 500 }
     );
   }

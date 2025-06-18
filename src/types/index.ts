@@ -1,4 +1,4 @@
-export type BikeStatus = 'AVAILABLE' | 'IN_USE' | 'MAINTENANCE' | 'RENTED';
+export type BikeStatus = 'AVAILABLE' | 'RENTED' | 'MAINTENANCE';
 
 export interface Bike {
   id: string;

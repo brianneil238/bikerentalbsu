@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import dynamic from 'next/dynamic';
-import { BikeStatus } from '@@/index';
+import { BikeStatus } from '@/types/index';
 
 // Dynamically import the map component to avoid SSR issues
 const Map = dynamic(() => import('@/components/Map'), {

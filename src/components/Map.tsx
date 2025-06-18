@@ -72,7 +72,7 @@ export default function Map({ bikes, selectedBike, onBikeSelect }: MapProps) {
         icon: {
           path: google.maps.SymbolPath.CIRCLE,
           scale: 8,
-          fillColor: bike.status === 'IN_USE' ? '#EF4444' : '#10B981',
+          fillColor: bike.status === 'RENTED' ? '#EF4444' : '#10B981',
           fillOpacity: 1,
           strokeColor: '#FFFFFF',
           strokeWeight: 2,

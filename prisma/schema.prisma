@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -179,9 +178,8 @@ enum UserRole {
 
 enum BikeStatus {
   AVAILABLE
-  IN_USE
-  MAINTENANCE
   RENTED
+  MAINTENANCE
 }
 
 enum RentalStatus {
