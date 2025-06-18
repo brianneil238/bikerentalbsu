@@ -37,7 +37,8 @@ export const config = {
   matcher: [
     '/dashboard/:path*', // Protected routes that require authentication
     '/admin/:path*',
-    '/rent/:path*',
+    // Temporarily removing /rent protection to debug
+    // '/rent/:path*',
     // IMPORTANT: Do NOT include '/login' or '/register' here.
     // NextAuth.js handles redirects to 'signIn' page automatically if 'authorized' callback returns false.
   ],
