@@ -49,10 +49,6 @@ export default function RentPage() {
       const response = await fetch('/api/bikes');
       
       if (!response.ok) {
-        if (response.status === 401) {
-          window.location.href = '/login';
-          return;
-        }
         throw new Error(`HTTP ${response.status}: Failed to fetch bikes`);
       }
       
@@ -82,10 +78,6 @@ export default function RentPage() {
       });
 
       if (!response.ok) {
-        if (response.status === 401) {
-          window.location.href = '/login';
-          return;
-        }
         const errorData = await response.json();
         throw new Error(errorData.message || `HTTP ${response.status}: Failed to rent bike`);
       }
