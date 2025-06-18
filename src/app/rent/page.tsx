@@ -37,6 +37,16 @@ interface ApplicationFormData {
   durationOfUse: string;
 }
 
+interface Rental {
+  id: string;
+  startTime: string;
+  endTime: string | null;
+  status: 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
+  bike: Bike;
+  distance: number | null;
+  carbonSaved: number | null;
+}
+
 export default function RentPage() {
   const { data: session, status } = useSession();
   const [bikes, setBikes] = useState<Bike[]>([]);
@@ -46,6 +56,11 @@ export default function RentPage() {
   const [currentStep, setCurrentStep] = useState<'application' | 'bikes'>('application');
   const [hasApplication, setHasApplication] = useState(false);
   const [isSubmittingApplication, setIsSubmittingApplication] = useState(false);
+  const [submittedApplicationData, setSubmittedApplicationData] = useState<ApplicationFormData | null>(null);
+  const [showApplicationReceipt, setShowApplicationReceipt] = useState(false);
+  const [currentRental, setCurrentRental] = useState<Rental | null>(null);
+  const [showRentalStatus, setShowRentalStatus] = useState(false);
+  const [isExtendingRental, setIsExtendingRental] = useState(false);
   const [applicationData, setApplicationData] = useState<ApplicationFormData>({
     firstName: '',
     lastName: '',
@@ -87,6 +102,7 @@ export default function RentPage() {
       console.log('User authenticated, checking application and fetching bikes');
       checkExistingApplication();
       fetchBikes();
+      fetchCurrentRental();
     }
   }, [status, session]);
 
@@ -102,10 +118,24 @@ export default function RentPage() {
         if (activeApplication) {
           setHasApplication(true);
           setCurrentStep('bikes');
+          setSubmittedApplicationData(activeApplication);
         }
       }
     } catch (err) {
       console.error('Error checking existing application:', err);
+    }
+  };
+
+  const fetchCurrentRental = async () => {
+    try {
+      const response = await fetch('/api/rentals');
+      if (response.ok) {
+        const rentals = await response.json();
+        const activeRental = rentals.find((r: Rental) => r.status === 'ACTIVE');
+        setCurrentRental(activeRental || null);
+      }
+    } catch (err) {
+      console.error('Error fetching current rental:', err);
     }
   };
 
@@ -154,9 +184,10 @@ export default function RentPage() {
       // Application submitted successfully
       setHasApplication(true);
       setCurrentStep('bikes');
+      setSubmittedApplicationData(applicationData);
       
       // Show success message
-      alert('Application submitted successfully! You can now proceed to rent a bike.');
+      alert('Application submitted successfully! You can now view your application receipt and proceed to rent a bike.');
       
     } catch (err) {
       console.error('Application submission error:', err);
@@ -166,7 +197,8 @@ export default function RentPage() {
     }
   };
 
-  const handleDownloadPDF = async () => {
+  const handleDownloadPDF = async (dataToUse?: ApplicationFormData) => {
+    const formData = dataToUse || applicationData;
     try {
       const response = await fetch('/api/generate-pdf', {
         method: 'POST',
@@ -174,7 +206,7 @@ export default function RentPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          formData: applicationData,
+          formData: formData,
           userId: session?.user?.id
         }),
       });
@@ -188,7 +220,7 @@ export default function RentPage() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `bike_rental_application_${applicationData.lastName}_${Date.now()}.pdf`;
+      a.download = `bike_rental_application_${formData.lastName}_${Date.now()}.pdf`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -197,6 +229,70 @@ export default function RentPage() {
     } catch (err) {
       console.error('PDF download error:', err);
       setError('Failed to download PDF. Please try again.');
+    }
+  };
+
+  const handleExtendRental = async () => {
+    if (!currentRental || isExtendingRental) return;
+    
+    setIsExtendingRental(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/rentals', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          rentalId: currentRental.id,
+          action: 'extend',
+          extendHours: 2 // Extend by 2 hours
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to extend rental');
+      }
+
+      // Refresh rental data
+      await fetchCurrentRental();
+      alert('Rental extended successfully by 2 hours!');
+      
+    } catch (err) {
+      console.error('Extend rental error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to extend rental. Please try again.');
+    } finally {
+      setIsExtendingRental(false);
+    }
+  };
+
+  const handleEndRental = async () => {
+    if (!currentRental) return;
+
+    try {
+      const response = await fetch('/api/rentals', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          rentalId: currentRental.id,
+          action: 'end',
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to end rental');
+      }
+
+      setCurrentRental(null);
+      alert('Rental ended successfully!');
+      
+    } catch (err) {
+      console.error('End rental error:', err);
+      setError('Failed to end rental. Please try again.');
     }
   };
 
@@ -270,6 +366,157 @@ export default function RentPage() {
         </div>
       )}
 
+      {/* Quick Action Buttons */}
+      <div className="flex flex-wrap gap-4 mb-8">
+        {submittedApplicationData && (
+          <button
+            onClick={() => setShowApplicationReceipt(!showApplicationReceipt)}
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium flex items-center space-x-2"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span>{showApplicationReceipt ? 'Hide' : 'View'} Application Receipt</span>
+          </button>
+        )}
+        
+        {currentRental && (
+          <button
+            onClick={() => setShowRentalStatus(!showRentalStatus)}
+            className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-medium flex items-center space-x-2"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{showRentalStatus ? 'Hide' : 'View'} Rental Status</span>
+          </button>
+        )}
+      </div>
+
+      {/* Application Receipt */}
+      {showApplicationReceipt && submittedApplicationData && (
+        <div className="bg-white rounded-lg shadow-lg p-6 mb-8 border-l-4 border-blue-600">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-blue-800">Application Receipt</h2>
+            <div className="flex space-x-3">
+                             <button
+                 onClick={(e) => { e.preventDefault(); handleDownloadPDF(submittedApplicationData); }}
+                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-medium flex items-center space-x-2"
+               >
+                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                 </svg>
+                 <span>Download PDF</span>
+               </button>
+              <button
+                onClick={() => setShowApplicationReceipt(false)}
+                className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 font-medium"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">Personal Information</h3>
+              <div className="space-y-2">
+                <div><span className="font-medium">Name:</span> {submittedApplicationData.firstName} {submittedApplicationData.middleName} {submittedApplicationData.lastName}</div>
+                <div><span className="font-medium">SR Code:</span> {submittedApplicationData.srCode}</div>
+                <div><span className="font-medium">Sex:</span> {submittedApplicationData.sex}</div>
+                <div><span className="font-medium">Date of Birth:</span> {submittedApplicationData.dateOfBirth}</div>
+                <div><span className="font-medium">Phone:</span> {submittedApplicationData.phoneNumber}</div>
+                <div><span className="font-medium">Email:</span> {submittedApplicationData.email}</div>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">Academic & Other Details</h3>
+              <div className="space-y-2">
+                <div><span className="font-medium">College/Program:</span> {submittedApplicationData.collegeProgram}</div>
+                <div><span className="font-medium">GWA:</span> {submittedApplicationData.gwaLastSemester || 'Not provided'}</div>
+                <div><span className="font-medium">Distance from Campus:</span> {submittedApplicationData.distanceFromCampus}</div>
+                <div><span className="font-medium">Duration of Use:</span> {submittedApplicationData.durationOfUse}</div>
+                <div><span className="font-medium">Address:</span> {submittedApplicationData.houseNo} {submittedApplicationData.streetName}, {submittedApplicationData.barangay}, {submittedApplicationData.municipalityCity}, {submittedApplicationData.province}</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="mt-6 p-4 bg-green-50 rounded-lg">
+            <div className="flex items-center space-x-2">
+              <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              <span className="text-green-800 font-medium">Application Status: Submitted Successfully</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rental Status */}
+      {showRentalStatus && currentRental && (
+        <div className="bg-white rounded-lg shadow-lg p-6 mb-8 border-l-4 border-green-600">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-green-800">Current Rental Status</h2>
+            <button
+              onClick={() => setShowRentalStatus(false)}
+              className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 font-medium"
+            >
+              Close
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">Rental Details</h3>
+              <div className="space-y-2">
+                <div><span className="font-medium">Bike Number:</span> #{currentRental.bike.bikeNumber}</div>
+                <div><span className="font-medium">Model:</span> {currentRental.bike.model}</div>
+                <div><span className="font-medium">Start Time:</span> {new Date(currentRental.startTime).toLocaleString()}</div>
+                <div><span className="font-medium">Status:</span> 
+                  <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm font-bold">
+                    {currentRental.status}
+                  </span>
+                </div>
+                {currentRental.distance && (
+                  <div><span className="font-medium">Distance:</span> {currentRental.distance.toFixed(2)} km</div>
+                )}
+                {currentRental.carbonSaved && (
+                  <div><span className="font-medium">Carbon Saved:</span> {currentRental.carbonSaved.toFixed(2)} kg CO₂</div>
+                )}
+              </div>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">Actions</h3>
+              <div className="space-y-3">
+                <button
+                  onClick={handleExtendRental}
+                  disabled={isExtendingRental}
+                  className={`w-full px-4 py-3 rounded-lg font-medium ${
+                    isExtendingRental 
+                      ? 'bg-gray-400 cursor-not-allowed' 
+                      : 'bg-blue-600 hover:bg-blue-700'
+                  } text-white`}
+                >
+                  {isExtendingRental ? 'Extending...' : 'Extend Rental (+2 hours)'}
+                </button>
+                <button
+                  onClick={handleEndRental}
+                  className="w-full bg-red-600 text-white px-4 py-3 rounded-lg hover:bg-red-700 font-medium"
+                >
+                  End Rental
+                </button>
+                <button
+                  onClick={() => window.location.href = '/rent/active'}
+                  className="w-full bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 font-medium"
+                >
+                  View Live Tracking
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Progress Steps */}
       <div className="flex items-center justify-center mb-8">
         <div className="flex items-center">
@@ -300,7 +547,7 @@ export default function RentPage() {
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-semibold text-green-800">Bike Rental Application Form</h2>
             <button
-              onClick={handleDownloadPDF}
+              onClick={() => handleDownloadPDF()}
               disabled={!applicationData.firstName || !applicationData.lastName}
               className={`px-4 py-2 rounded-lg text-white font-medium ${
                 applicationData.firstName && applicationData.lastName

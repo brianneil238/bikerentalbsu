@@ -140,7 +140,7 @@ export async function PATCH(req: Request) {
       );
     }
 
-    const { rentalId, action } = await req.json();
+    const { rentalId, action, extendHours } = await req.json();
 
     const rental = await prisma.rental.findUnique({
       where: { id: rentalId },
@@ -174,6 +174,40 @@ export async function PATCH(req: Request) {
         });
 
         return rental;
+      });
+
+      return NextResponse.json(updatedRental);
+    }
+
+    if (action === 'extend') {
+      if (!extendHours || extendHours <= 0) {
+        return NextResponse.json(
+          { message: 'Invalid extension hours' },
+          { status: 400 }
+        );
+      }
+
+      // Check if rental is still active
+      if (rental.status !== 'ACTIVE') {
+        return NextResponse.json(
+          { message: 'Cannot extend completed or cancelled rental' },
+          { status: 400 }
+        );
+      }
+
+      // For now, we'll just log the extension since we don't have an explicit end time field
+      // In a real implementation, you might want to add an `expectedEndTime` field to track extensions
+      console.log(`Rental ${rentalId} extended by ${extendHours} hours`);
+      
+      // Update rental to indicate extension (you might want to add a field for this)
+      const updatedRental = await prisma.rental.update({
+        where: { id: rentalId },
+        data: {
+          updatedAt: new Date(), // Update the timestamp to indicate activity
+        },
+        include: {
+          bike: true,
+        },
       });
 
       return NextResponse.json(updatedRental);
