@@ -22,14 +22,26 @@ export default function RentPage() {
   const [error, setError] = useState<string | null>(null);
   const [isRenting, setIsRenting] = useState(false);
 
+  // Debug session
+  console.log('🔍 Rent Page - Session status:', status);
+  console.log('🔍 Rent Page - Session data:', session);
+
   useEffect(() => {
     if (status === 'loading') return; // Wait for session to load
+    
+    // Let NextAuth middleware handle authentication redirects
+    // Only fetch bikes if we're authenticated
     if (status === 'unauthenticated') {
-      window.location.href = '/login';
+      console.log('User not authenticated');
       return;
     }
-    fetchBikes();
-  }, [status]);
+    
+    // If we have a session, fetch bikes
+    if (status === 'authenticated' && session) {
+      console.log('User authenticated, fetching bikes');
+      fetchBikes();
+    }
+  }, [status, session]);
 
   const fetchBikes = async () => {
     try {
@@ -101,7 +113,11 @@ export default function RentPage() {
   if (status === 'unauthenticated') {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="text-center">Please log in to rent a bike.</div>
+        <div className="text-center">
+          Please log in to rent a bike.
+          <br />
+          <a href="/login" className="text-green-600 hover:text-green-800">Go to Login</a>
+        </div>
       </div>
     );
   }
