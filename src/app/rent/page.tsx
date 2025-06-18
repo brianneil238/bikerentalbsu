@@ -288,7 +288,8 @@ export default function RentPage() {
       }
 
       setCurrentRental(null);
-      alert('Rental ended successfully!');
+      setShowRentalStatus(false);
+      alert('Rental ended successfully! You can now rent another bike.');
       
     } catch (err) {
       console.error('End rental error:', err);

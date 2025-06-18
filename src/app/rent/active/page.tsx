@@ -76,7 +76,7 @@ export default function ActiveRentalPage() {
         throw new Error('Failed to end rental');
       }
 
-      router.push('/dashboard');
+      router.push('/rent');
     } catch (err) {
       setError('Failed to end rental. Please try again.');
     }
