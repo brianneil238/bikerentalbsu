@@ -27,6 +27,9 @@ export async function GET() {
         currentLocation: true,
         model: true,
       },
+      orderBy: {
+        bikeNumber: 'asc',
+      },
     });
 
     console.log(`✅ Bikes API: Found ${bikes.length} bikes`);
