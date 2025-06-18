@@ -417,29 +417,78 @@ export default function RentPage() {
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">Personal Information</h3>
-              <div className="space-y-2">
-                <div><span className="font-medium">Name:</span> {submittedApplicationData.firstName} {submittedApplicationData.middleName} {submittedApplicationData.lastName}</div>
-                <div><span className="font-medium">SR Code:</span> {submittedApplicationData.srCode}</div>
-                <div><span className="font-medium">Sex:</span> {submittedApplicationData.sex}</div>
-                <div><span className="font-medium">Date of Birth:</span> {submittedApplicationData.dateOfBirth}</div>
-                <div><span className="font-medium">Phone:</span> {submittedApplicationData.phoneNumber}</div>
-                <div><span className="font-medium">Email:</span> {submittedApplicationData.email}</div>
-              </div>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">Academic & Other Details</h3>
-              <div className="space-y-2">
-                <div><span className="font-medium">College/Program:</span> {submittedApplicationData.collegeProgram}</div>
-                <div><span className="font-medium">GWA:</span> {submittedApplicationData.gwaLastSemester || 'Not provided'}</div>
-                <div><span className="font-medium">Distance from Campus:</span> {submittedApplicationData.distanceFromCampus}</div>
-                <div><span className="font-medium">Duration of Use:</span> {submittedApplicationData.durationOfUse}</div>
-                <div><span className="font-medium">Address:</span> {submittedApplicationData.houseNo} {submittedApplicationData.streetName}, {submittedApplicationData.barangay}, {submittedApplicationData.municipalityCity}, {submittedApplicationData.province}</div>
-              </div>
-            </div>
-          </div>
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+             <div className="bg-gray-50 p-4 rounded-lg">
+               <h3 className="text-lg font-bold text-blue-800 mb-4 border-b-2 border-blue-200 pb-2">Personal Information</h3>
+               <div className="space-y-3">
+                 <div className="flex flex-col">
+                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Full Name</span>
+                   <span className="text-base font-bold text-gray-900 mt-1">{submittedApplicationData.firstName} {submittedApplicationData.middleName} {submittedApplicationData.lastName}</span>
+                 </div>
+                 <div className="flex flex-col">
+                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">SR Code</span>
+                   <span className="text-base font-bold text-gray-900 mt-1">{submittedApplicationData.srCode}</span>
+                 </div>
+                 <div className="flex flex-col">
+                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Sex</span>
+                   <span className="text-base font-bold text-gray-900 mt-1">{submittedApplicationData.sex}</span>
+                 </div>
+                 <div className="flex flex-col">
+                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Date of Birth</span>
+                   <span className="text-base font-bold text-gray-900 mt-1">{new Date(submittedApplicationData.dateOfBirth).toLocaleDateString()}</span>
+                 </div>
+                 <div className="flex flex-col">
+                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Phone Number</span>
+                   <span className="text-base font-bold text-gray-900 mt-1">{submittedApplicationData.phoneNumber}</span>
+                 </div>
+                 <div className="flex flex-col">
+                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Email Address</span>
+                   <span className="text-base font-bold text-blue-600 mt-1">{submittedApplicationData.email}</span>
+                 </div>
+               </div>
+             </div>
+             <div className="bg-gray-50 p-4 rounded-lg">
+               <h3 className="text-lg font-bold text-blue-800 mb-4 border-b-2 border-blue-200 pb-2">Academic & Other Details</h3>
+               <div className="space-y-3">
+                 <div className="flex flex-col">
+                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">College/Program</span>
+                   <span className="text-base font-bold text-gray-900 mt-1">{submittedApplicationData.collegeProgram}</span>
+                 </div>
+                 <div className="flex flex-col">
+                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">GWA Last Semester</span>
+                   <span className="text-base font-bold text-green-600 mt-1">{submittedApplicationData.gwaLastSemester || 'Not provided'}</span>
+                 </div>
+                 <div className="flex flex-col">
+                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Distance from Campus</span>
+                   <span className="text-base font-bold text-gray-900 mt-1">{submittedApplicationData.distanceFromCampus}</span>
+                 </div>
+                 <div className="flex flex-col">
+                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Duration of Use</span>
+                   <span className="text-base font-bold text-gray-900 mt-1">{submittedApplicationData.durationOfUse}</span>
+                 </div>
+                 <div className="flex flex-col">
+                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Home Address</span>
+                   <span className="text-sm font-medium text-gray-900 mt-1 leading-relaxed">
+                     {submittedApplicationData.houseNo} {submittedApplicationData.streetName}<br/>
+                     {submittedApplicationData.barangay}, {submittedApplicationData.municipalityCity}<br/>
+                     {submittedApplicationData.province}
+                   </span>
+                 </div>
+                 {submittedApplicationData.extracurricularActivities && (
+                   <div className="flex flex-col">
+                     <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Extracurricular Activities</span>
+                     <span className="text-sm font-medium text-gray-900 mt-1">{submittedApplicationData.extracurricularActivities}</span>
+                   </div>
+                 )}
+                 {submittedApplicationData.monthlyFamilyIncome && (
+                   <div className="flex flex-col">
+                     <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Monthly Family Income</span>
+                     <span className="text-base font-bold text-green-600 mt-1">₱{parseFloat(submittedApplicationData.monthlyFamilyIncome).toLocaleString()}</span>
+                   </div>
+                 )}
+               </div>
+             </div>
+           </div>
           
           <div className="mt-6 p-4 bg-green-50 rounded-lg">
             <div className="flex items-center space-x-2">
@@ -465,54 +514,88 @@ export default function RentPage() {
             </button>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">Rental Details</h3>
-              <div className="space-y-2">
-                <div><span className="font-medium">Bike Number:</span> #{currentRental.bike.bikeNumber}</div>
-                <div><span className="font-medium">Model:</span> {currentRental.bike.model}</div>
-                <div><span className="font-medium">Start Time:</span> {new Date(currentRental.startTime).toLocaleString()}</div>
-                <div><span className="font-medium">Status:</span> 
-                  <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm font-bold">
-                    {currentRental.status}
-                  </span>
-                </div>
-                {currentRental.distance && (
-                  <div><span className="font-medium">Distance:</span> {currentRental.distance.toFixed(2)} km</div>
-                )}
-                {currentRental.carbonSaved && (
-                  <div><span className="font-medium">Carbon Saved:</span> {currentRental.carbonSaved.toFixed(2)} kg CO₂</div>
-                )}
-              </div>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">Actions</h3>
-              <div className="space-y-3">
-                <button
-                  onClick={handleExtendRental}
-                  disabled={isExtendingRental}
-                  className={`w-full px-4 py-3 rounded-lg font-medium ${
-                    isExtendingRental 
-                      ? 'bg-gray-400 cursor-not-allowed' 
-                      : 'bg-blue-600 hover:bg-blue-700'
-                  } text-white`}
-                >
-                  {isExtendingRental ? 'Extending...' : 'Extend Rental (+2 hours)'}
-                </button>
-                <button
-                  onClick={handleEndRental}
-                  className="w-full bg-red-600 text-white px-4 py-3 rounded-lg hover:bg-red-700 font-medium"
-                >
-                  End Rental
-                </button>
-                <button
-                  onClick={() => window.location.href = '/rent/active'}
-                  className="w-full bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 font-medium"
-                >
-                  View Live Tracking
-                </button>
-              </div>
-            </div>
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+             <div className="bg-gray-50 p-4 rounded-lg">
+               <h3 className="text-lg font-bold text-green-800 mb-4 border-b-2 border-green-200 pb-2">Rental Details</h3>
+               <div className="space-y-3">
+                 <div className="flex flex-col">
+                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Bike Number</span>
+                   <span className="text-lg font-bold text-gray-900 mt-1">#{currentRental.bike.bikeNumber}</span>
+                 </div>
+                 <div className="flex flex-col">
+                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Model</span>
+                   <span className="text-base font-bold text-gray-900 mt-1">{currentRental.bike.model}</span>
+                 </div>
+                 <div className="flex flex-col">
+                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Start Time</span>
+                   <span className="text-base font-bold text-gray-900 mt-1">{new Date(currentRental.startTime).toLocaleString()}</span>
+                 </div>
+                 <div className="flex flex-col">
+                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Status</span>
+                   <span className="mt-1">
+                     <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-bold uppercase">
+                       {currentRental.status}
+                     </span>
+                   </span>
+                 </div>
+                 {currentRental.distance && (
+                   <div className="flex flex-col">
+                     <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Distance Traveled</span>
+                     <span className="text-base font-bold text-blue-600 mt-1">{currentRental.distance.toFixed(2)} km</span>
+                   </div>
+                 )}
+                 {currentRental.carbonSaved && (
+                   <div className="flex flex-col">
+                     <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Carbon Saved</span>
+                     <span className="text-base font-bold text-green-600 mt-1">{currentRental.carbonSaved.toFixed(2)} kg CO₂</span>
+                   </div>
+                 )}
+               </div>
+             </div>
+                         <div className="bg-gray-50 p-4 rounded-lg">
+               <h3 className="text-lg font-bold text-green-800 mb-4 border-b-2 border-green-200 pb-2">Quick Actions</h3>
+               <div className="space-y-4">
+                 <button
+                   onClick={handleExtendRental}
+                   disabled={isExtendingRental}
+                   className={`w-full px-4 py-3 rounded-lg font-bold text-sm uppercase tracking-wide transition-all duration-200 ${
+                     isExtendingRental 
+                       ? 'bg-gray-400 cursor-not-allowed text-gray-700' 
+                       : 'bg-blue-600 hover:bg-blue-700 hover:shadow-lg text-white'
+                   }`}
+                 >
+                   <div className="flex items-center justify-center space-x-2">
+                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                     </svg>
+                     <span>{isExtendingRental ? 'Extending...' : 'Extend Rental (+2 hours)'}</span>
+                   </div>
+                 </button>
+                 <button
+                   onClick={handleEndRental}
+                   className="w-full bg-red-600 text-white px-4 py-3 rounded-lg hover:bg-red-700 hover:shadow-lg font-bold text-sm uppercase tracking-wide transition-all duration-200"
+                 >
+                   <div className="flex items-center justify-center space-x-2">
+                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m0 0a9 9 0 01-9-9m9 9v-9" />
+                     </svg>
+                     <span>End Rental</span>
+                   </div>
+                 </button>
+                 <button
+                   onClick={() => window.location.href = '/rent/active'}
+                   className="w-full bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 hover:shadow-lg font-bold text-sm uppercase tracking-wide transition-all duration-200"
+                 >
+                   <div className="flex items-center justify-center space-x-2">
+                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                     </svg>
+                     <span>View Live Tracking</span>
+                   </div>
+                 </button>
+               </div>
+             </div>
           </div>
         </div>
       )}
