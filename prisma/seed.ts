@@ -34,7 +34,7 @@ async function main() {
   const bikes = [
     {
       bikeNumber: 'BSU-001',
-      model: 'Mountain Bike Pro',
+      model: 'Standard Bike',
       currentLocation: {
         lat: 16.4023,
         lng: 120.5960
@@ -43,7 +43,7 @@ async function main() {
     },
     {
       bikeNumber: 'BSU-002', 
-      model: 'City Cruiser',
+      model: 'Standard Bike',
       currentLocation: {
         lat: 16.4025,
         lng: 120.5962
@@ -52,7 +52,7 @@ async function main() {
     },
     {
       bikeNumber: 'BSU-003',
-      model: 'Electric Bike',
+      model: 'Standard Bike',
       currentLocation: {
         lat: 16.4027,
         lng: 120.5965
@@ -61,7 +61,7 @@ async function main() {
     },
     {
       bikeNumber: 'BSU-004',
-      model: 'Hybrid Bike',
+      model: 'Standard Bike',
       currentLocation: {
         lat: 16.4021,
         lng: 120.5958
@@ -70,12 +70,57 @@ async function main() {
     },
     {
       bikeNumber: 'BSU-005',
-      model: 'Road Bike',
+      model: 'Standard Bike',
       currentLocation: {
         lat: 16.4029,
         lng: 120.5967
       },
       purchaseDate: new Date('2024-01-25'),
+    },
+    {
+      bikeNumber: 'BSU-006',
+      model: 'Standard Bike',
+      currentLocation: {
+        lat: 16.4031,
+        lng: 120.5969
+      },
+      purchaseDate: new Date('2024-02-01'),
+    },
+    {
+      bikeNumber: 'BSU-007',
+      model: 'Standard Bike',
+      currentLocation: {
+        lat: 16.4019,
+        lng: 120.5956
+      },
+      purchaseDate: new Date('2024-02-01'),
+    },
+    {
+      bikeNumber: 'BSU-008',
+      model: 'Standard Bike',
+      currentLocation: {
+        lat: 16.4033,
+        lng: 120.5971
+      },
+      purchaseDate: new Date('2024-02-05'),
+    },
+    {
+      bikeNumber: 'BSU-009',
+      model: 'Standard Bike',
+      currentLocation: {
+        lat: 16.4017,
+        lng: 120.5954
+      },
+      purchaseDate: new Date('2024-02-05'),
+    },
+    {
+      bikeNumber: 'BSU-010',
+      model: 'Standard Bike',
+      currentLocation: {
+        lat: 16.4035,
+        lng: 120.5973
+      },
+      purchaseDate: new Date('2024-02-10'),
     },
   ];
 
