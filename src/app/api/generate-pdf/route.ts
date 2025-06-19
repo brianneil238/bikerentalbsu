@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import chromium from '@sparticuz/chromium';
-import puppeteer from 'puppeteer-core';
 
 // Ensure this is NOT an Edge function
 // export const runtime = 'edge'; // <-- DO NOT include this line
@@ -151,30 +149,9 @@ export async function POST(req: Request) {
 
     console.log('📝 HTML content generated successfully');
 
-    // Generate PDF using Puppeteer + @sparticuz/chromium
-    const executablePath = await chromium.executablePath();
-    console.log('Chromium executablePath:', executablePath);
-    const browser = await puppeteer.launch({
-      args: chromium.args,
-      executablePath,
-    });
-    
-    const page = await browser.newPage();
-    await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
-    
-    const pdfBuffer = await page.pdf({
-      format: 'A4',
-      printBackground: true,
-      margin: {
-        top: '20mm',
-        right: '20mm',
-        bottom: '20mm',
-        left: '20mm'
-      }
-    });
-    
-    await browser.close();
-    
+    // Dynamically import the server-only PDF generator
+    const { generatePdf } = await import('@/server/pdf/generatePdf');
+    const pdfBuffer = await generatePdf(htmlContent);
     console.log('✅ PDF generated successfully, size:', pdfBuffer.length, 'bytes');
 
     // Return PDF as response
