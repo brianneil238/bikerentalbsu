@@ -31,7 +31,7 @@ function LoginForm() {
         setError(result.error);
       } else {
         // Redirect to a specific page after successful login
-        const from = searchParams.get('from') || '/';
+        const from = searchParams?.get('from') || '/';
         router.push(from);
       }
     } catch (error) {
@@ -45,7 +45,7 @@ function LoginForm() {
     }
   };
 
-  const registered = searchParams.get('registered');
+  const registered = searchParams?.get('registered');
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-green-50 py-12 px-4 sm:px-6 lg:px-8">
