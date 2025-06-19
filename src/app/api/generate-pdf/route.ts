@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import puppeteer from 'puppeteer';
+import chromium from '@sparticuz/chromium';
+import puppeteer from 'puppeteer-core';
+
+// Ensure this is NOT an Edge function
+// export const runtime = 'edge'; // <-- DO NOT include this line
 
 export async function POST(req: Request) {
   try {
@@ -147,10 +151,12 @@ export async function POST(req: Request) {
 
     console.log('📝 HTML content generated successfully');
 
-    // Generate PDF using Puppeteer
+    // Generate PDF using Puppeteer + @sparticuz/chromium
+    const executablePath = await chromium.executablePath();
+    console.log('Chromium executablePath:', executablePath);
     const browser = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: chromium.args,
+      executablePath,
     });
     
     const page = await browser.newPage();
@@ -186,7 +192,8 @@ export async function POST(req: Request) {
     return NextResponse.json(
       { 
         message: 'Error generating PDF', 
-        error: error instanceof Error ? error.message : 'Unknown error' 
+        error: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
       }, 
       { status: 500 }
     );
