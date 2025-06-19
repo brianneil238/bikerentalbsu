@@ -1,31 +1,26 @@
-import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../../src/lib/auth';
+import { generatePdf } from '../../server/pdf/generatePdf';
 
-// Ensure this is NOT an Edge function
-// export const runtime = 'edge'; // <-- DO NOT include this line
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', ['POST']);
+    return res.status(405).json({ message: 'Method Not Allowed' });
+  }
 
-export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    
+    const session = await getServerSession(req, res, authOptions);
     if (!session || !session.user) {
-      return NextResponse.json(
-        { message: 'Unauthorized' }, 
-        { status: 401 }
-      );
+      return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    const { formData, userId, rentalId } = await req.json();
-    
+    const { formData, userId, rentalId } = req.body;
     console.log('🚀 PDF Generation started for user:', userId);
 
     // Validate required form data
     if (!formData || !formData.firstName || !formData.lastName) {
-      return NextResponse.json(
-        { message: 'Missing required form data' }, 
-        { status: 400 }
-      );
+      return res.status(400).json({ message: 'Missing required form data' });
     }
 
     // Create HTML content for the PDF
@@ -49,10 +44,10 @@ export async function POST(req: Request) {
     <body>
       <div class="header">
         <h1>BIKE RENTAL APPLICATION FORM</h1>
-        <p>Application Date: ${new Date().toLocaleDateString('en-US', { 
-          year: 'numeric', 
-          month: 'long', 
-          day: 'numeric' 
+        <p>Application Date: ${new Date().toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
         })}</p>
       </div>
 
@@ -149,30 +144,19 @@ export async function POST(req: Request) {
 
     console.log('📝 HTML content generated successfully');
 
-    // Dynamically import the server-only PDF generator
-    const { generatePdf } = await import('../../../../server/pdf/generatePdf');
     const pdfBuffer = await generatePdf(htmlContent);
     console.log('✅ PDF generated successfully, size:', pdfBuffer.length, 'bytes');
 
-    // Return PDF as response
-    return new NextResponse(pdfBuffer, {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="bike_rental_application_${formData.lastName}_${Date.now()}.pdf"`,
-        'Content-Length': pdfBuffer.length.toString(),
-      },
-    });
-
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="bike_rental_application_${formData.lastName}_${Date.now()}.pdf"`);
+    res.setHeader('Content-Length', pdfBuffer.length.toString());
+    res.status(200).send(pdfBuffer);
   } catch (error) {
     console.error('❌ Error generating PDF:', error);
-    return NextResponse.json(
-      { 
-        message: 'Error generating PDF', 
-        error: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined,
-      }, 
-      { status: 500 }
-    );
+    res.status(500).json({
+      message: 'Error generating PDF',
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+    });
   }
 } 
