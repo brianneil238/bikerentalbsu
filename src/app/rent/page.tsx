@@ -197,41 +197,6 @@ export default function RentPage() {
     }
   };
 
-  const handleDownloadPDF = async (dataToUse?: ApplicationFormData) => {
-    const formData = dataToUse || applicationData;
-    try {
-      const response = await fetch('/api/generate-pdf', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          formData: formData,
-          userId: session?.user?.id
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to generate PDF');
-      }
-
-      // Create download link
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `bike_rental_application_${formData.lastName}_${Date.now()}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      
-    } catch (err) {
-      console.error('PDF download error:', err);
-      setError('Failed to download PDF. Please try again.');
-    }
-  };
-
   const handleExtendRental = async () => {
     if (!currentRental || isExtendingRental) return;
     
@@ -400,15 +365,6 @@ export default function RentPage() {
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-blue-800">Application Receipt</h2>
             <div className="flex space-x-3">
-                             <button
-                 onClick={(e) => { e.preventDefault(); handleDownloadPDF(submittedApplicationData); }}
-                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-medium flex items-center space-x-2"
-               >
-                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                 </svg>
-                 <span>Download PDF</span>
-               </button>
               <button
                 onClick={() => setShowApplicationReceipt(false)}
                 className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 font-medium"
@@ -630,17 +586,6 @@ export default function RentPage() {
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-semibold text-green-800">Bike Rental Application Form</h2>
-            <button
-              onClick={() => handleDownloadPDF()}
-              disabled={!applicationData.firstName || !applicationData.lastName}
-              className={`px-4 py-2 rounded-lg text-white font-medium ${
-                applicationData.firstName && applicationData.lastName
-                  ? 'bg-blue-600 hover:bg-blue-700'
-                  : 'bg-gray-400 cursor-not-allowed'
-              }`}
-            >
-              Download PDF
-            </button>
           </div>
           
           <form onSubmit={handleApplicationSubmit} className="space-y-6">
