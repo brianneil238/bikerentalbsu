@@ -150,7 +150,7 @@ export async function POST(req: Request) {
     console.log('📝 HTML content generated successfully');
 
     // Dynamically import the server-only PDF generator
-    const { generatePdf } = await import('@/server/pdf/generatePdf');
+    const { generatePdf } = await import('../../../../server/pdf/generatePdf');
     const pdfBuffer = await generatePdf(htmlContent);
     console.log('✅ PDF generated successfully, size:', pdfBuffer.length, 'bytes');
 
