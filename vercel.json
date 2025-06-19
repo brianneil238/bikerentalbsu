@@ -1,7 +1,7 @@
 {
   "functions": {
     "api/generate-pdf/route.js": {
-      "runtime": "nodejs20.x"
+      "runtime": "nodejs20"
     }
   }
 } 
