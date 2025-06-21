@@ -109,8 +109,26 @@ export async function GET() {
       );
     }
 
-    // Get user's applications
-    const applications = await prisma.bikeRentalApplication.findMany({
+    // Prioritize finding an active application
+    const activeApplication = await prisma.bikeRentalApplication.findFirst({
+      where: {
+        userId: session.user.id,
+        status: {
+          in: ['PENDING', 'APPROVED', 'UNDER_REVIEW']
+        }
+      },
+      orderBy: {
+        submittedAt: 'desc'
+      }
+    });
+
+    if (activeApplication) {
+      return NextResponse.json([activeApplication]);
+    }
+    
+    // If no active application, find the most recent one regardless of status
+    // This will show a rejected status if that's the latest one.
+    const latestApplication = await prisma.bikeRentalApplication.findFirst({
       where: {
         userId: session.user.id
       },
@@ -119,7 +137,12 @@ export async function GET() {
       }
     });
 
-    return NextResponse.json(applications);
+    if (latestApplication) {
+      return NextResponse.json([latestApplication]);
+    }
+
+    // If no applications at all, return empty array
+    return NextResponse.json([]);
 
   } catch (error) {
     console.error('Error fetching applications:', error);

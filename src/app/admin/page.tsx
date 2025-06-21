@@ -15,6 +15,21 @@ interface Application {
   user: {
     email: string;
   };
+  middleName?: string;
+  sex: string;
+  dateOfBirth: string;
+  phoneNumber: string;
+  collegeProgram: string;
+  gwaLastSemester?: number;
+  extracurricularActivities?: string;
+  houseNo: string;
+  streetName: string;
+  barangay: string;
+  municipalityCity: string;
+  province: string;
+  distanceFromCampus: string;
+  monthlyFamilyIncome?: number;
+  durationOfUse: string;
 }
 
 export default function AdminPage() {
@@ -22,6 +37,7 @@ export default function AdminPage() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
 
   useEffect(() => {
     if (status === 'authenticated' && session?.user?.role === 'ADMIN') {
@@ -72,6 +88,15 @@ export default function AdminPage() {
     } catch (err) {
       alert(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
+  };
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
   };
 
   if (isLoading) {
@@ -128,30 +153,94 @@ export default function AdminPage() {
                   </span>
                 </td>
                 <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                  {app.status === 'PENDING' || app.status === 'UNDER_REVIEW' ? (
-                    <div className="flex space-x-2">
-                      <button 
-                        onClick={() => handleUpdateStatus(app.id, 'APPROVED')}
-                        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                      >
-                        Approve
-                      </button>
-                      <button 
-                        onClick={() => handleUpdateStatus(app.id, 'REJECTED')}
-                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                      >
-                        Reject
-                      </button>
-                    </div>
-                  ) : (
-                    <span className="text-gray-500">Action Taken</span>
-                  )}
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => setSelectedApplication(app)}
+                      className="text-indigo-600 hover:text-indigo-900 font-bold py-2 px-4 rounded"
+                    >
+                      View
+                    </button>
+                    {(app.status === 'PENDING' || app.status === 'UNDER_REVIEW') && (
+                      <>
+                        <button 
+                          onClick={() => handleUpdateStatus(app.id, 'APPROVED')}
+                          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                        >
+                          Approve
+                        </button>
+                        <button 
+                          onClick={() => handleUpdateStatus(app.id, 'REJECTED')}
+                          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                        >
+                          Reject
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      {selectedApplication && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+          <div className="relative mx-auto p-8 border w-full max-w-4xl shadow-lg rounded-md bg-white">
+            <button
+              onClick={() => setSelectedApplication(null)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
+            >
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <h3 className="text-2xl font-bold text-gray-900 mb-6">Application Details</h3>
+            <div className="space-y-6 text-sm">
+
+              <div className="p-4 border rounded-lg bg-gray-50">
+                <h4 className="font-semibold text-base text-gray-800 mb-3">Personal Information</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-3 text-gray-900">
+                  <p><span className="font-medium text-gray-600">Full Name:</span><br/>{`${selectedApplication.firstName} ${selectedApplication.middleName || ''} ${selectedApplication.lastName}`}</p>
+                  <p><span className="font-medium text-gray-600">Date of Birth:</span><br/>{formatDate(selectedApplication.dateOfBirth)}</p>
+                  <p><span className="font-medium text-gray-600">Sex:</span><br/>{selectedApplication.sex}</p>
+                  <p><span className="font-medium text-gray-600">Email:</span><br/>{selectedApplication.user.email}</p>
+                  <p><span className="font-medium text-gray-600">Phone Number:</span><br/>{selectedApplication.phoneNumber}</p>
+                </div>
+              </div>
+
+              <div className="p-4 border rounded-lg bg-gray-50">
+                <h4 className="font-semibold text-base text-gray-800 mb-3">Academic Information</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-3 text-gray-900">
+                  <p><span className="font-medium text-gray-600">SR Code:</span><br/>{selectedApplication.srCode}</p>
+                  <p><span className="font-medium text-gray-600">Program:</span><br/>{selectedApplication.collegeProgram}</p>
+                  <p><span className="font-medium text-gray-600">GWA Last Semester:</span><br/>{selectedApplication.gwaLastSemester || 'N/A'}</p>
+                  <p className="col-span-full"><span className="font-medium text-gray-600">Extracurricular Activities:</span><br/>{selectedApplication.extracurricularActivities || 'None'}</p>
+                </div>
+              </div>
+
+              <div className="p-4 border rounded-lg bg-gray-50">
+                <h4 className="font-semibold text-base text-gray-800 mb-3">Address & Usage Information</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-gray-900">
+                  <p className="col-span-full"><span className="font-medium text-gray-600">Address:</span><br/>{`${selectedApplication.houseNo}, ${selectedApplication.streetName}, ${selectedApplication.barangay}, ${selectedApplication.municipalityCity}, ${selectedApplication.province}`}</p>
+                  <p><span className="font-medium text-gray-600">Distance from Campus:</span><br/>{selectedApplication.distanceFromCampus}</p>
+                  <p><span className="font-medium text-gray-600">Duration of Use:</span><br/>{selectedApplication.durationOfUse}</p>
+                  <p><span className="font-medium text-gray-600">Monthly Family Income:</span><br/>{selectedApplication.monthlyFamilyIncome ? `₱${selectedApplication.monthlyFamilyIncome.toLocaleString()}` : 'N/A'}</p>
+                </div>
+              </div>
+              
+              <div className="flex justify-end pt-4">
+                <button
+                  onClick={() => setSelectedApplication(null)}
+                  className="bg-gray-200 text-gray-800 font-bold py-2 px-6 rounded-lg hover:bg-gray-300 transition duration-300"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
