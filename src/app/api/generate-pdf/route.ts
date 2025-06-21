@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import puppeteer from 'puppeteer-core';
 import chromium from '@sparticuz/chromium';
 
+export const runtime = 'nodejs20.x';
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
