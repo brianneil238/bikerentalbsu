@@ -100,8 +100,8 @@ export default function ActiveRentalPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+    <div className="container mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto">
           {/* Main Header with better contrast */}
           <div className="bg-green-700 text-white px-6 py-4 rounded-t-lg">
             <div className="flex justify-between items-center">
@@ -118,11 +118,11 @@ export default function ActiveRentalPage() {
             </div>
           </div>
 
-          {error && (
+        {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
               <strong>Error:</strong> {error}
-            </div>
-          )}
+          </div>
+        )}
 
           <div className="bg-white rounded-b-lg shadow-lg">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
@@ -139,33 +139,33 @@ export default function ActiveRentalPage() {
                   <div className="border-b border-gray-100 pb-2">
                     <dt className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Model</dt>
                     <dd className="text-lg font-bold text-gray-900 mt-1">{rental.bike.model}</dd>
-                  </div>
+                </div>
                   <div className="border-b border-gray-100 pb-2">
                     <dt className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Start Time</dt>
                     <dd className="text-lg font-bold text-gray-900 mt-1">
-                      {formatDistanceToNow(new Date(rental.startTime), {
-                        addSuffix: true,
-                      })}
-                    </dd>
-                  </div>
-                  {rental.distance && (
+                    {formatDistanceToNow(new Date(rental.startTime), {
+                      addSuffix: true,
+                    })}
+                  </dd>
+                </div>
+                {rental.distance && (
                     <div className="border-b border-gray-100 pb-2">
                       <dt className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Distance</dt>
                       <dd className="text-lg font-bold text-green-600 mt-1">
-                        {rental.distance.toFixed(2)} km
-                      </dd>
-                    </div>
-                  )}
-                  {rental.carbonSaved && (
+                      {rental.distance.toFixed(2)} km
+                    </dd>
+                  </div>
+                )}
+                {rental.carbonSaved && (
                     <div className="border-b border-gray-100 pb-2">
                       <dt className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Carbon Saved</dt>
                       <dd className="text-lg font-bold text-green-600 mt-1">
-                        {rental.carbonSaved.toFixed(2)} kg CO₂
-                      </dd>
-                    </div>
-                  )}
-                </dl>
-              </div>
+                      {rental.carbonSaved.toFixed(2)} kg CO₂
+                    </dd>
+                  </div>
+                )}
+              </dl>
+            </div>
 
               {/* Live Location Section */}
               <div className="p-6">
@@ -174,11 +174,11 @@ export default function ActiveRentalPage() {
                 </div>
                 <div className="h-[300px] rounded-lg overflow-hidden border-2 border-gray-200 shadow-inner">
                   {rental.bike.currentLocation ? (
-                    <Map
-                      bikes={[rental.bike]}
-                      selectedBike={rental.bike}
-                      onBikeSelect={() => {}}
-                    />
+                  <Map
+                    bikes={[rental.bike]}
+                    selectedBike={rental.bike}
+                    onBikeSelect={() => {}}
+                  />
                   ) : (
                     <div className="h-full flex items-center justify-center bg-gray-100">
                       <div className="text-center">
@@ -186,7 +186,7 @@ export default function ActiveRentalPage() {
                         <div className="text-gray-400 text-sm mt-2">Please wait while we track your bike</div>
                       </div>
                     </div>
-                  )}
+                )}
                 </div>
               </div>
             </div>
@@ -199,13 +199,13 @@ export default function ActiveRentalPage() {
                   <span className="ml-2 px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-bold uppercase">
                     Active
                   </span>
-                </div>
-                <button
-                  onClick={handleEndRental}
+          </div>
+            <button
+              onClick={handleEndRental}
                   className="bg-red-600 text-white px-8 py-3 rounded-lg hover:bg-red-700 transition-colors font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105"
-                >
-                  End Rental
-                </button>
+            >
+              End Rental
+            </button>
               </div>
             </div>
           </div>
