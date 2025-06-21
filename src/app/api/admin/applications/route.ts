@@ -1,98 +1,64 @@
-import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 
-export async function GET() {
+// GET all applications (for admins)
+export async function GET(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || session.user?.role !== 'ADMIN') {
+    return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+  }
+
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session || session.user.role !== 'ADMIN') {
-      return NextResponse.json(
-        { message: 'Unauthorized - Admin access required' },
-        { status: 401 }
-      );
-    }
-
-    // Get all applications with user information
     const applications = await prisma.bikeRentalApplication.findMany({
+      orderBy: {
+        submittedAt: 'desc',
+      },
       include: {
         user: {
           select: {
-            name: true,
             email: true,
-            role: true,
-          }
-        }
+          },
+        },
       },
-      orderBy: {
-        submittedAt: 'desc'
-      }
     });
-
     return NextResponse.json(applications);
-
   } catch (error) {
-    console.error('Error fetching applications:', error);
-    return NextResponse.json(
-      { message: 'Internal server error' },
-      { status: 500 }
-    );
+    console.error('Error fetching applications for admin:', error);
+    return NextResponse.json({ message: 'Error fetching applications' }, { status: 500 });
   }
 }
 
-export async function PATCH(req: Request) {
+// POST to update an application's status (for admins)
+export async function POST(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || session.user?.role !== 'ADMIN') {
+    return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+  }
+
   try {
-    const session = await getServerSession(authOptions);
+    const body = await request.json();
+    const { applicationId, status } = body;
 
-    if (!session || session.user.role !== 'ADMIN') {
-      return NextResponse.json(
-        { message: 'Unauthorized - Admin access required' },
-        { status: 401 }
-      );
+    if (!applicationId || !['APPROVED', 'REJECTED'].includes(status)) {
+      return NextResponse.json({ message: 'Invalid request body' }, { status: 400 });
     }
 
-    const { applicationId, status, notes } = await req.json();
-
-    if (!applicationId || !status) {
-      return NextResponse.json(
-        { message: 'Missing required fields' },
-        { status: 400 }
-      );
-    }
-
-    // Update application status
     const updatedApplication = await prisma.bikeRentalApplication.update({
-      where: {
-        id: applicationId
-      },
-      data: {
+      where: { id: applicationId },
+      data: { 
         status,
-        notes,
         reviewedAt: new Date(),
-        reviewedBy: session.user.id
+        reviewedBy: session.user.email, // Or user ID
       },
-      include: {
-        user: {
-          select: {
-            name: true,
-            email: true,
-            role: true,
-          }
-        }
-      }
     });
 
-    return NextResponse.json({
-      message: 'Application status updated successfully',
-      application: updatedApplication
-    });
-
+    return NextResponse.json(updatedApplication);
   } catch (error) {
-    console.error('Error updating application:', error);
-    return NextResponse.json(
-      { message: 'Internal server error' },
-      { status: 500 }
-    );
+    console.error('Error updating application status:', error);
+    return NextResponse.json({ message: 'Error updating application status' }, { status: 500 });
   }
 } 

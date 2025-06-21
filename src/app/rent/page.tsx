@@ -61,6 +61,7 @@ export default function RentPage() {
   const [currentRental, setCurrentRental] = useState<Rental | null>(null);
   const [showRentalStatus, setShowRentalStatus] = useState(false);
   const [isExtendingRental, setIsExtendingRental] = useState(false);
+  const [applicationStatus, setApplicationStatus] = useState<'PENDING' | 'APPROVED' | 'REJECTED' | 'UNDER_REVIEW' | null>(null);
   const [applicationData, setApplicationData] = useState<ApplicationFormData>({
     firstName: '',
     lastName: '',
@@ -111,14 +112,16 @@ export default function RentPage() {
       const response = await fetch('/api/applications');
       if (response.ok) {
         const applications = await response.json();
-        const activeApplication = applications.find((app: any) => 
-          ['PENDING', 'APPROVED', 'UNDER_REVIEW'].includes(app.status)
-        );
-        
-        if (activeApplication) {
+        if (applications && applications.length > 0) {
+          // Assuming the user has only one most recent application to consider
+          const latestApplication = applications[0];
           setHasApplication(true);
-          setCurrentStep('bikes');
-          setSubmittedApplicationData(activeApplication);
+          setSubmittedApplicationData(latestApplication);
+          setApplicationStatus(latestApplication.status);
+          
+          if (latestApplication.status === 'APPROVED') {
+            setCurrentStep('bikes');
+          }
         }
       }
     } catch (err) {
@@ -185,9 +188,10 @@ export default function RentPage() {
       setHasApplication(true);
       setCurrentStep('bikes');
       setSubmittedApplicationData(applicationData);
+      setApplicationStatus('PENDING');
       
       // Show success message
-      alert('Application submitted successfully! You can now view your application receipt and proceed to rent a bike.');
+      alert('Application submitted successfully! You will be notified once it has been reviewed by an administrator.');
       
     } catch (err) {
       console.error('Application submission error:', err);
@@ -302,6 +306,32 @@ export default function RentPage() {
     }
   };
 
+  const renderApplicationStatus = () => {
+    switch (applicationStatus) {
+      case 'PENDING':
+      case 'UNDER_REVIEW':
+        return (
+          <div className="text-center p-8 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700">
+            <h2 className="text-2xl font-bold mb-4">Application Submitted</h2>
+            <p className="text-lg">Your application is currently under review. We will notify you once a decision has been made. Thank you for your patience.</p>
+          </div>
+        );
+      case 'REJECTED':
+        return (
+          <div className="text-center p-8 bg-red-100 border-l-4 border-red-500 text-red-700">
+            <h2 className="text-2xl font-bold mb-4">Application Rejected</h2>
+            <p className="text-lg">We regret to inform you that your application has been rejected. If you believe this is an error, please contact support.</p>
+          </div>
+        );
+      case 'APPROVED':
+        // The main bike rental UI will be shown instead
+        return null; 
+      default:
+        // No application or status yet
+        return null;
+    }
+  };
+
   if (status === 'loading') {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -314,10 +344,34 @@ export default function RentPage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
-          Please log in to rent a bike.
-          <br />
-          <a href="/login" className="text-green-600 hover:text-green-800">Go to Login</a>
+          <p className="text-center text-lg">You must be logged in to rent a bike.</p>
         </div>
+      </div>
+    );
+  }
+
+  // Render based on application status FIRST, if an application exists
+  if (hasApplication && applicationStatus !== 'APPROVED') {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-4xl font-bold text-center mb-8">Bike Rental</h1>
+        {renderApplicationStatus()}
+        {submittedApplicationData && (
+           <div className="mt-8">
+            <button
+              onClick={() => setShowApplicationReceipt(!showApplicationReceipt)}
+              className="w-full bg-gray-200 text-gray-800 font-bold py-3 px-4 rounded-lg hover:bg-gray-300 transition duration-300 mb-4"
+            >
+              {showApplicationReceipt ? 'Hide' : 'View'} Submitted Application Receipt
+            </button>
+            {showApplicationReceipt && (
+              <div className="bg-white p-6 rounded-lg shadow-md prose max-w-none">
+                <h3 className="text-xl font-bold mb-4">Your Application Details</h3>
+                <pre className="bg-gray-100 p-4 rounded">{JSON.stringify(submittedApplicationData, null, 2)}</pre>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     );
   }
