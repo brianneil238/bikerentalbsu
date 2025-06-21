@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ['puppeteer-core', '@sparticuz/chromium'],
+  experimental: {
+    serverComponentsExternalPackages: ['@sparticuz/chromium'],
+  },
 };
 
 module.exports = nextConfig; 
