@@ -30,9 +30,34 @@ function LoginForm() {
       if (result?.error) {
         setError(result.error);
       } else {
-        // Redirect to a specific page after successful login
-        const from = searchParams?.get('from') || '/';
-        router.push(from);
+        // Check if the user is an admin by making a request to get user info
+        try {
+          const userResponse = await fetch('/api/auth/user-info', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (userResponse.ok) {
+            const userData = await userResponse.json();
+            if (userData.role === 'ADMIN') {
+              router.push('/admin');
+            } else {
+              // Redirect to a specific page after successful login
+              const from = searchParams?.get('from') || '/';
+              router.push(from);
+            }
+          } else {
+            // Fallback redirect
+            const from = searchParams?.get('from') || '/';
+            router.push(from);
+          }
+        } catch (userError) {
+          // Fallback redirect if user info fetch fails
+          const from = searchParams?.get('from') || '/';
+          router.push(from);
+        }
       }
     } catch (error) {
       if (error instanceof Error) {

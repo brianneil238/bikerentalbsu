@@ -19,6 +19,11 @@ export function Navigation() {
     { href: '/about', label: 'About' },
   ];
 
+  // Add admin link if user is admin
+  const allNavItems = session?.user?.role === 'ADMIN' 
+    ? [...navItems, { href: '/admin', label: 'Admin' }]
+    : navItems;
+
   return (
     <nav className="bg-white shadow-lg border-b border-green-100">
       <div className="container mx-auto px-4">
@@ -30,7 +35,7 @@ export function Navigation() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex space-x-8">
-            {navItems.map((item) => (
+            {allNavItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -100,7 +105,7 @@ export function Navigation() {
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-green-100">
-            {navItems.map((item) => (
+            {allNavItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}

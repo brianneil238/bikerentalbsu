@@ -30,6 +30,30 @@ async function main() {
     console.log('⏭️ Test user already exists, skipping...');
   }
 
+  // Create an admin user
+  console.log('👑 Creating admin user...');
+  const adminEmail = 'admin@bsu.edu.ph';
+  
+  const existingAdmin = await prisma.user.findUnique({
+    where: { email: adminEmail },
+  });
+
+  if (!existingAdmin) {
+    const hashedPassword = await hash('admin123', 12);
+    
+    await prisma.user.create({
+      data: {
+        email: adminEmail,
+        name: 'Admin User',
+        password: hashedPassword,
+        role: 'ADMIN',
+      },
+    });
+    console.log('✅ Created admin user: admin@bsu.edu.ph (password: admin123)');
+  } else {
+    console.log('⏭️ Admin user already exists, skipping...');
+  }
+
   // Create some sample bikes
   const bikes = [
     {
