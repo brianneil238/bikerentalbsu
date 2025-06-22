@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
@@ -30,14 +30,7 @@ export default function ActiveRentalPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchActiveRental();
-    // Set up real-time updates
-    const interval = setInterval(fetchActiveRental, 10000); // Update every 10 seconds
-    return () => clearInterval(interval);
-  }, []);
-
-  const fetchActiveRental = async () => {
+  const fetchActiveRental = useCallback(async () => {
     try {
       const response = await fetch('/api/rentals');
       if (!response.ok) throw new Error('Failed to fetch rental');
@@ -55,7 +48,14 @@ export default function ActiveRentalPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    fetchActiveRental();
+    // Set up real-time updates
+    const interval = setInterval(fetchActiveRental, 10000); // Update every 10 seconds
+    return () => clearInterval(interval);
+  }, [fetchActiveRental]);
 
   const handleEndRental = async () => {
     if (!rental) return;

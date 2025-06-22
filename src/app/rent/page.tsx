@@ -309,18 +309,21 @@ export default function RentPage() {
   const renderApplicationStatus = () => {
     switch (applicationStatus) {
       case 'PENDING':
-      case 'UNDER_REVIEW':
         return (
-          <div className="text-center p-8 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700">
-            <h2 className="text-2xl font-bold mb-4">Application Submitted</h2>
-            <p className="text-lg">Your application is currently under review. We will notify you once a decision has been made. Thank you for your patience.</p>
+          <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4" role="alert">
+            <p className="font-bold">Application Under Review</p>
+            <p>Your application is currently being reviewed by our administrators. You will be notified via email once a decision has been made. You can view your submitted application details below.</p>
+            <p>Please check back later or wait for an email for an update on your application&apos;s status.</p>
+            <p className="mt-2">If you have any urgent questions, please don&apos;t hesitate to contact our support team at <a href="mailto:support@example.com" className="font-medium underline">support@example.com</a>.</p>
           </div>
         );
       case 'REJECTED':
         return (
-          <div className="text-center p-8 bg-red-100 border-l-4 border-red-500 text-red-700">
-            <h2 className="text-2xl font-bold mb-4">Application Rejected</h2>
-            <p className="text-lg">We regret to inform you that your application has been rejected. If you believe this is an error, please contact support.</p>
+          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
+            <p className="font-bold">Application Rejected</p>
+            <p>We regret to inform you that your application has been rejected. This decision may be based on a variety of factors, such as incomplete information or not meeting the eligibility criteria.</p>
+            <p>If you believe this was a mistake or wish to provide additional information, please contact our administrative office to discuss your application. Please reference your SR-Code for faster processing.</p>
+            <p className="mt-2">You may need to submit a new application with updated details if you wish to re-apply. For further clarification, please contact support.</p>
           </div>
         );
       case 'APPROVED':
