@@ -11,6 +11,12 @@ export function Navigation() {
   const pathname = usePathname();
   const { data: session, status } = useSession();
 
+  const hideNavOnRoutes = ['/login', '/register'];
+
+  if (pathname && hideNavOnRoutes.includes(pathname)) {
+    return null;
+  }
+
   const isActive = (path: string) => pathname === path;
 
   const navItems = [
