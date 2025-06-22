@@ -40,11 +40,11 @@ function LoginForm() {
           if (userData.role === 'ADMIN') {
             router.push('/admin');
           } else {
-            const from = searchParams?.get('from') || '/rent';
+            const from = searchParams?.get('from') || '/';
             router.push(from);
           }
         } else {
-          const from = searchParams?.get('from') || '/rent';
+          const from = searchParams?.get('from') || '/';
           router.push(from);
         }
       }

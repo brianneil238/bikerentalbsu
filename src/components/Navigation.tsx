@@ -13,11 +13,20 @@ export function Navigation() {
 
   const isActive = (path: string) => pathname === path;
 
-  const navItems = [
+  let navItems = [
     { href: '/', label: 'Home' },
     { href: '/rent', label: 'Rent a Bike' },
     { href: '/about', label: 'About' },
   ];
+
+  if (status === 'authenticated') {
+    navItems = [
+      { href: '/', label: 'Home' },
+      { href: '/rent', label: 'Rent a Bike' },
+      { href: '/rent', label: 'Dashboard' },
+      { href: '/about', label: 'About' },
+    ];
+  }
 
   // Add admin link if user is admin
   const allNavItems = session?.user?.role === 'ADMIN' 
