@@ -76,7 +76,7 @@ function LoginForm() {
       </div>
 
       <div className="bg-blue-600 py-2">
-        <p className="text-center text-white text-sm">Spartan's Pedal Access & Rental Transport Assistant
+        <p className="text-center text-white text-sm">Spartan&apos;s Pedal Access & Rental Transport Assistant
         </p>
       </div>
       
