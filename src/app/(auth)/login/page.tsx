@@ -31,7 +31,7 @@ function LoginForm() {
       });
 
       if (result?.error) {
-        setError('Invalid BSU Email or password.');
+        setError('Invalid Email or password.');
       } else {
         // Redirect based on role or to previous page
         const userResponse = await fetch('/api/auth/user-info');
@@ -64,8 +64,8 @@ function LoginForm() {
           <div className="flex items-center space-x-3">
             <Image src="/spartan_logo.png" alt="BSU Logo" width={50} height={50} />
             <div>
-              <h1 className="text-lg font-bold text-red-700">BATANGAS STATE UNIVERSITY</h1>
-              <p className="text-xs text-gray-600">The National Engineering University</p>
+              <h1 className="text-lg font-bold text-red-700">SPARTA</h1>
+              <p className="text-xs text-gray-600">BATANGAS STATE UNIVERSITY - TNEU</p>
             </div>
           </div>
         </div>
@@ -102,7 +102,7 @@ function LoginForm() {
                   autoComplete="email"
                   required
                   className="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-md bg-black text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  placeholder="BSU Email"
+                  placeholder="Email"
                 />
               </div>
               <div className="relative flex items-center">
