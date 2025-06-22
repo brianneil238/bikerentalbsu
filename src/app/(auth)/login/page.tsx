@@ -72,7 +72,7 @@ function LoginForm() {
       </header>
 
       <div className="bg-white py-4 shadow-sm">
-        <h2 className="text-center text-2xl font-bold text-gray-800 tracking-wide">STUDENT PORTAL</h2>
+        <h2 className="text-center text-2xl font-bold text-gray-800 tracking-wide">University Bike Rental</h2>
       </div>
 
       <div className="bg-blue-600 py-2">
