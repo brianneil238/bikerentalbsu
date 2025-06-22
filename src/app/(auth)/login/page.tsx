@@ -4,7 +4,7 @@ import React, { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import Link from 'next/link';
-import { User, Lock, HelpCircle, Mail } from 'lucide-react';
+import { Mail, Lock, HelpCircle, Eye, EyeOff } from 'lucide-react';
 import Image from 'next/image';
 
 function LoginForm() {
@@ -12,6 +12,7 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -19,18 +20,18 @@ function LoginForm() {
     setError(null);
 
     const formData = new FormData(e.currentTarget);
-    const srCode = formData.get('srCode') as string;
+    const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
     try {
       const result = await signIn('credentials', {
         redirect: false,
-        email: srCode,
+        email: email,
         password,
       });
 
       if (result?.error) {
-        setError('Invalid SR-Code or password.');
+        setError('Invalid BSU Email or password.');
       } else {
         // Redirect based on role or to previous page
         const userResponse = await fetch('/api/auth/user-info');
@@ -92,16 +93,16 @@ function LoginForm() {
               
               <div className="relative flex items-center">
                 <span className="absolute left-0 top-0 flex items-center justify-center w-10 h-full bg-gray-200 rounded-l-md">
-                  <User className="h-5 w-5 text-gray-500" />
+                  <Mail className="h-5 w-5 text-gray-500" />
                 </span>
                 <input
-                  id="sr-code"
-                  name="srCode"
-                  type="text"
-                  autoComplete="username"
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
                   required
                   className="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-md bg-black text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  placeholder="22-34005"
+                  placeholder="BSU Email"
                 />
               </div>
               <div className="relative flex items-center">
@@ -111,12 +112,20 @@ function LoginForm() {
                 <input
                   id="password"
                   name="password"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   required
-                  className="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-md bg-black text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  placeholder="••••••••••••"
+                  className="w-full pl-12 pr-10 py-2 border border-gray-300 rounded-md bg-black text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  placeholder="Password"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 flex items-center justify-center w-10 text-gray-400 hover:text-gray-600"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
               </div>
 
               <p className="text-xs text-gray-500">* Password is case sensitive</p>
