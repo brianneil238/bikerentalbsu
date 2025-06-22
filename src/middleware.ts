@@ -34,5 +34,5 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ['/rent', '/admin', '/rent/active'],
+  matcher: ['/', '/rent', '/admin', '/rent/active'],
 }; 
