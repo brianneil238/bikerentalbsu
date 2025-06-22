@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Navigation } from "../components/Navigation";
+import { headers } from 'next/headers';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,11 +18,15 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = headers().get('next-url') || '';
+  const hideNavOnRoutes = ['/login', '/register'];
+  const shouldHideNav = hideNavOnRoutes.includes(pathname);
+
   return (
     <html lang="en">
       <body className={inter.className}>
         <Providers>
-          <Navigation />
+          {!shouldHideNav && <Navigation />}
           {children}
         </Providers>
       </body>
