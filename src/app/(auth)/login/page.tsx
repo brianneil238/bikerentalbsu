@@ -120,7 +120,7 @@ function LoginForm() {
 
               <div className="flex items-center justify-center p-4 border border-gray-200 rounded-md bg-gray-50">
                 <div className="w-6 h-6 border border-gray-400 rounded-sm"></div>
-                <span className="ml-3 text-sm text-gray-700">I'm not a robot</span>
+                <span className="ml-3 text-sm text-gray-700">I&apos;m not a robot</span>
                 <div className="ml-auto text-xs text-gray-400">
                   reCAPTCHA
                   <br/>
