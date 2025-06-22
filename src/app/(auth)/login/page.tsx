@@ -124,7 +124,7 @@ function LoginForm() {
               <div className="flex items-center justify-between p-3 border border-gray-200 rounded-md bg-gray-50">
                 <div className="flex items-center">
                   <input type="checkbox" className="w-5 h-5 border-gray-400 rounded-sm" />
-                  <span className="ml-2 text-sm text-gray-700">I'm not a robot</span>
+                  <span className="ml-2 text-sm text-gray-700">I&apos;m not a robot</span>
                 </div>
                 <div className="text-xs text-gray-400 text-right">
                   reCAPTCHA
@@ -144,16 +144,12 @@ function LoginForm() {
                 </button>
               </div>
 
-              <div className="text-xs text-center space-y-2 pt-4">
+              <div className="text-xs text-center pt-4 border-t mt-4">
                 <Link href="#" className="text-green-600 hover:underline inline-flex items-center">
                   <HelpCircle className="w-4 h-4 mr-1" />
                   Forgot password? Click here
                 </Link>
-                <div className="flex items-center justify-center">
-                    <div className="border-t border-gray-300 w-1/4"></div>
-                    <span className="px-2 text-gray-400">or</span>
-                    <div className="border-t border-gray-300 w-1/4"></div>
-                </div>
+                <span className="mx-2 text-gray-300">|</span>
                 <Link href="#" className="text-green-600 hover:underline inline-flex items-center">
                   <Mail className="w-4 h-4 mr-1" />
                   Contact Us
