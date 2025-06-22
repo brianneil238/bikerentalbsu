@@ -153,16 +153,13 @@ function LoginForm() {
                 </button>
               </div>
 
-              <div className="text-xs text-center pt-4 border-t mt-4">
-                <Link href="#" className="text-green-600 hover:underline inline-flex items-center">
-                  <HelpCircle className="w-4 h-4 mr-1" />
-                  Forgot password? Click here
-                </Link>
-                <span className="mx-2 text-gray-300">|</span>
-                <Link href="#" className="text-green-600 hover:underline inline-flex items-center">
-                  <Mail className="w-4 h-4 mr-1" />
-                  Contact Us
-                </Link>
+              <div className="text-center mt-6">
+                <p className="text-sm">
+                  <span className="text-gray-600">Don&apos;t have an account? </span>
+                  <Link href="/register" className="font-semibold text-blue-700 hover:underline">
+                    Sign Up
+                  </Link>
+                </p>
               </div>
             </form>
           </div>
