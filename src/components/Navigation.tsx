@@ -16,7 +16,6 @@ export function Navigation() {
   const navItems = [
     { href: '/', label: 'Home' },
     { href: '/rent', label: 'Rent a Bike' },
-    { href: '/dashboard', label: 'Dashboard' },
     { href: '/about', label: 'About' },
   ];
 
