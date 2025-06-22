@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
+import Image from 'next/image';
 
 export function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -29,8 +30,9 @@ export function Navigation() {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/" className="text-xl font-bold text-green-700 hover:text-green-800 transition-colors">
-            🚲 BikeShare
+          <Link href="/" className="flex items-center text-xl font-bold text-green-700 hover:text-green-800 transition-colors">
+            <Image src="/spartan_logo.png" alt="Spartan Logo" width={40} height={40} className="mr-2" />
+            SPARTA
           </Link>
 
           {/* Desktop Navigation */}
