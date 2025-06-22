@@ -25,12 +25,12 @@ export function Navigation() {
     : navItems;
 
   return (
-    <nav className="bg-white shadow-lg border-b border-green-100">
+    <nav className="bg-white shadow-md">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center text-xl font-bold text-green-700 hover:text-green-800 transition-colors">
-            <Image src="/spartan_logo.png" alt="Spartan Logo" width={40} height={40} className="mr-2" />
+          <Link href="/" className="flex items-center text-xl font-bold text-red-700 hover:text-red-800 transition-colors">
+            <Image src="/spartan_logo.png" alt="Sparta Logo" width={40} height={40} className="mr-2" />
             SPARTA
           </Link>
 
@@ -42,8 +42,8 @@ export function Navigation() {
                 href={item.href}
                 className={`${
                   isActive(item.href)
-                    ? 'text-green-700 font-semibold'
-                    : 'text-gray-600 hover:text-green-700'
+                    ? 'text-blue-700 font-semibold'
+                    : 'text-gray-600 hover:text-blue-700'
                 } transition-colors duration-200`}
               >
                 {item.label}
@@ -57,7 +57,7 @@ export function Navigation() {
               <>
                 <Link
                   href="/login"
-                  className="text-gray-600 hover:text-green-700 transition-colors duration-200"
+                  className="text-gray-600 hover:text-blue-700 transition-colors duration-200"
                 >
                   Login
                 </Link>
@@ -72,7 +72,7 @@ export function Navigation() {
             {status === 'authenticated' && (
               <button
                 onClick={() => signOut({ callbackUrl: '/' })}
-                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors duration-200"
+                className="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors duration-200"
               >
                 Logout
               </button>
@@ -81,7 +81,7 @@ export function Navigation() {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden text-green-700 hover:text-green-800 transition-colors"
+            className="md:hidden text-blue-700 hover:text-blue-800 transition-colors"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
           >
@@ -105,27 +105,27 @@ export function Navigation() {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-green-100">
+          <div className="md:hidden py-4 border-t border-gray-200">
             {allNavItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 className={`block py-2 ${
                   isActive(item.href)
-                    ? 'text-green-700 font-semibold'
-                    : 'text-gray-600 hover:text-green-700'
+                    ? 'text-blue-700 font-semibold'
+                    : 'text-gray-600 hover:text-blue-700'
                 } transition-colors duration-200`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 {item.label}
               </Link>
             ))}
-            <div className="pt-4 space-y-2">
+            <div className="pt-4 space-y-2 border-t border-gray-200 mt-4">
               {status === 'unauthenticated' && (
                 <>
                   <Link
                     href="/login"
-                    className="block text-gray-600 hover:text-green-700 transition-colors duration-200"
+                    className="block text-gray-600 hover:text-blue-700 transition-colors duration-200"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Login
@@ -145,7 +145,7 @@ export function Navigation() {
                     signOut({ callbackUrl: '/' });
                     setIsMenuOpen(false);
                   }}
-                  className="block bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors duration-200 text-center w-full"
+                  className="block bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors duration-200 text-center w-full"
                 >
                   Logout
                 </button>

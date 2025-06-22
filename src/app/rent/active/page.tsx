@@ -99,67 +99,62 @@ export default function ActiveRentalPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto">
-          {/* Main Header with better contrast */}
-          <div className="bg-green-700 text-white px-6 py-4 rounded-t-lg">
+    <div className="min-h-screen bg-gray-100">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg">
+          {/* Main Header */}
+          <div className="bg-blue-600 text-white px-6 py-4 rounded-t-lg">
             <div className="flex justify-between items-center">
               <h1 className="text-3xl font-bold">Active Rental</h1>
               <button
                 onClick={() => router.push('/rent')}
-                className="bg-green-600 hover:bg-green-800 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
+                className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors flex items-center space-x-2"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
-                <span>Back to Rental Page</span>
+                <span>Back to Rentals</span>
               </button>
             </div>
           </div>
 
-        {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md m-6">
               <strong>Error:</strong> {error}
-          </div>
-        )}
+            </div>
+          )}
 
-          <div className="bg-white rounded-b-lg shadow-lg">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-              {/* Rental Details Section */}
-              <div className="p-6 border-r border-gray-200">
-                <div className="bg-blue-600 text-white px-4 py-2 rounded-lg mb-4">
-                  <h2 className="text-xl font-bold">Rental Details</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2">
+            {/* Rental Details Section */}
+            <div className="p-6 border-r border-gray-200">
+              <h2 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Rental Details</h2>
+              <dl className="space-y-4">
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">Bike Number</dt>
+                  <dd className="text-lg font-semibold text-gray-900">#{rental.bike.bikeNumber}</dd>
                 </div>
-                <dl className="space-y-4">
-                  <div className="border-b border-gray-100 pb-2">
-                    <dt className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Bike Number</dt>
-                    <dd className="text-lg font-bold text-gray-900 mt-1">#{rental.bike.bikeNumber}</dd>
-                  </div>
-                  <div className="border-b border-gray-100 pb-2">
-                    <dt className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Model</dt>
-                    <dd className="text-lg font-bold text-gray-900 mt-1">{rental.bike.model}</dd>
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">Model</dt>
+                  <dd className="text-lg font-semibold text-gray-900">{rental.bike.model}</dd>
                 </div>
-                  <div className="border-b border-gray-100 pb-2">
-                    <dt className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Start Time</dt>
-                    <dd className="text-lg font-bold text-gray-900 mt-1">
-                    {formatDistanceToNow(new Date(rental.startTime), {
-                      addSuffix: true,
-                    })}
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">Rental Duration</dt>
+                  <dd className="text-lg font-semibold text-gray-900">
+                    {formatDistanceToNow(new Date(rental.startTime), { addSuffix: true })}
                   </dd>
                 </div>
                 {rental.distance && (
-                    <div className="border-b border-gray-100 pb-2">
-                      <dt className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Distance</dt>
-                      <dd className="text-lg font-bold text-green-600 mt-1">
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">Distance</dt>
+                    <dd className="text-lg font-semibold text-blue-600">
                       {rental.distance.toFixed(2)} km
                     </dd>
                   </div>
                 )}
                 {rental.carbonSaved && (
-                    <div className="border-b border-gray-100 pb-2">
-                      <dt className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Carbon Saved</dt>
-                      <dd className="text-lg font-bold text-green-600 mt-1">
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">Carbon Saved</dt>
+                    <dd className="text-lg font-semibold text-blue-600">
                       {rental.carbonSaved.toFixed(2)} kg CO₂
                     </dd>
                   </div>
@@ -167,46 +162,42 @@ export default function ActiveRentalPage() {
               </dl>
             </div>
 
-              {/* Live Location Section */}
-              <div className="p-6">
-                <div className="bg-blue-600 text-white px-4 py-2 rounded-lg mb-4">
-                  <h2 className="text-xl font-bold">Live Location</h2>
-                </div>
-                <div className="h-[300px] rounded-lg overflow-hidden border-2 border-gray-200 shadow-inner">
-                  {rental.bike.currentLocation ? (
+            {/* Live Location Section */}
+            <div className="p-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Live Location</h2>
+              <div className="h-[300px] rounded-lg overflow-hidden border-2 border-gray-200 shadow-inner">
+                {rental.bike.currentLocation ? (
                   <Map
                     bikes={[rental.bike]}
                     selectedBike={rental.bike}
                     onBikeSelect={() => {}}
                   />
-                  ) : (
-                    <div className="h-full flex items-center justify-center bg-gray-100">
-                      <div className="text-center">
-                        <div className="text-gray-500 text-lg font-semibold">Location Loading...</div>
-                        <div className="text-gray-400 text-sm mt-2">Please wait while we track your bike</div>
-                      </div>
+                ) : (
+                  <div className="h-full flex items-center justify-center bg-gray-100">
+                    <div className="text-center text-gray-500">
+                      Location data is currently unavailable.
                     </div>
+                  </div>
                 )}
-                </div>
               </div>
             </div>
-
-            {/* End Rental Button Section */}
-            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-lg">
-              <div className="flex justify-between items-center">
-                <div className="text-sm text-gray-600">
-                  <span className="font-semibold">Status:</span> 
-                  <span className="ml-2 px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-bold uppercase">
-                    Active
-                  </span>
           </div>
-            <button
-              onClick={handleEndRental}
-                  className="bg-red-600 text-white px-8 py-3 rounded-lg hover:bg-red-700 transition-colors font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105"
-            >
-              End Rental
-            </button>
+
+          {/* End Rental Button Section */}
+          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-lg">
+            <div className="flex justify-between items-center">
+              <div className="text-sm text-gray-600">
+                <span className="font-semibold">Status:</span> 
+                <span className="ml-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-bold uppercase">
+                  Active
+                </span>
               </div>
+              <button
+                onClick={handleEndRental}
+                className="bg-red-600 text-white px-6 py-2 rounded-md font-semibold hover:bg-red-700 transition-colors"
+              >
+                End Rental
+              </button>
             </div>
           </div>
         </div>

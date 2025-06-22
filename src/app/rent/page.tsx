@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { BikeStatus } from '@/types/index';
+import { FileText, ChevronDown, ChevronUp, Clock, Calendar, CheckCircle, AlertTriangle, XCircle, Hourglass } from 'lucide-react';
 
 interface Bike {
   id: string;
@@ -202,36 +203,26 @@ export default function RentPage() {
   };
 
   const handleExtendRental = async () => {
-    if (!currentRental || isExtendingRental) return;
-    
-    setIsExtendingRental(true);
-    setError(null);
+    if (!currentRental) return;
 
+    setIsExtendingRental(true);
     try {
-      const response = await fetch('/api/rentals', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          rentalId: currentRental.id,
-          action: 'extend',
-          extendHours: 2 // Extend by 2 hours
-        }),
+      const response = await fetch(`/api/rentals`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'extend', rentalId: currentRental.id }),
       });
 
-      if (!response.ok) {
+      if (response.ok) {
+        alert('Rental extended successfully!');
+        fetchCurrentRental(); // Refresh rental data
+      } else {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to extend rental');
+        throw new Error(errorData.message || 'Failed to extend rental.');
       }
-
-      // Refresh rental data
-      await fetchCurrentRental();
-      alert('Rental extended successfully by 2 hours!');
-      
     } catch (err) {
       console.error('Extend rental error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to extend rental. Please try again.');
+      alert(err instanceof Error ? err.message : 'An error occurred.');
     } finally {
       setIsExtendingRental(false);
     }
@@ -239,30 +230,27 @@ export default function RentPage() {
 
   const handleEndRental = async () => {
     if (!currentRental) return;
-
-    try {
-      const response = await fetch('/api/rentals', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          rentalId: currentRental.id,
-          action: 'end',
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to end rental');
+    
+    if (confirm('Are you sure you want to end your current rental?')) {
+      try {
+        const response = await fetch(`/api/rentals`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'end', rentalId: currentRental.id }),
+        });
+  
+        if (response.ok) {
+          alert('Rental ended successfully!');
+          setCurrentRental(null); // Clear current rental
+          window.location.href = '/rent/active'; // Redirect to see final stats
+        } else {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to end rental.');
+        }
+      } catch (err) {
+        console.error('End rental error:', err);
+        alert(err instanceof Error ? err.message : 'An error occurred.');
       }
-
-      setCurrentRental(null);
-      setShowRentalStatus(false);
-      alert('Rental ended successfully! You can now rent another bike.');
-      
-    } catch (err) {
-      console.error('End rental error:', err);
-      setError('Failed to end rental. Please try again.');
     }
   };
 
@@ -307,754 +295,298 @@ export default function RentPage() {
   };
 
   const renderApplicationStatus = () => {
+    if (!hasApplication || !applicationStatus) return null;
+
+    let statusStyles = 'border-l-4 p-4 my-4 rounded-r-lg ';
+    let icon = null;
+    let statusText = '';
+
     switch (applicationStatus) {
-      case 'PENDING':
-        return (
-          <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4" role="alert">
-            <p className="font-bold">Application Under Review</p>
-            <p>Your application is currently being reviewed by our administrators. You will be notified via email once a decision has been made. You can view your submitted application details below.</p>
-            {/* eslint-disable-next-line react/no-unescaped-entities */}
-            <p>Please check back later or wait for an email for an update on your application&apos;s status.</p>
-            <p className="mt-2">If you have any urgent questions, please don&apos;t hesitate to contact our support team at <a href="mailto:support@example.com" className="font-medium underline">support@example.com</a>.</p>
-          </div>
-        );
-      case 'REJECTED':
-        return (
-          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
-            <p className="font-bold">Application Rejected</p>
-            <p>We regret to inform you that your application has been rejected. This decision may be based on a variety of factors, such as incomplete information or not meeting the eligibility criteria.</p>
-            <p>If you believe this was a mistake or wish to provide additional information, please contact our administrative office to discuss your application. Please reference your SR-Code for faster processing.</p>
-            <p className="mt-2">You may need to submit a new application with updated details if you wish to re-apply. For further clarification, please contact support.</p>
-          </div>
-        );
       case 'APPROVED':
-        // The main bike rental UI will be shown instead
-        return null; 
+        statusStyles += 'bg-blue-50 border-blue-500 text-blue-800';
+        icon = <CheckCircle className="inline-block mr-2" />;
+        statusText = 'Your application has been approved! You can now select a bike.';
+        break;
+      case 'PENDING':
+        statusStyles += 'bg-yellow-50 border-yellow-500 text-yellow-800';
+        icon = <Hourglass className="inline-block mr-2" />;
+        statusText = 'Your application is pending review. You will be notified of the outcome.';
+        break;
+      case 'UNDER_REVIEW':
+        statusStyles += 'bg-blue-50 border-blue-500 text-blue-800';
+        icon = <Hourglass className="inline-block mr-2" />;
+        statusText = 'Your application is currently under review by an administrator.';
+        break;
+      case 'REJECTED':
+        statusStyles += 'bg-red-50 border-red-500 text-red-800';
+        icon = <XCircle className="inline-block mr-2" />;
+        statusText = 'Your application has been rejected. Please contact support for more information.';
+        break;
       default:
-        // No application or status yet
         return null;
     }
-  };
 
-  if (status === 'loading') {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center">Loading...</div>
-      </div>
-    );
-  }
-
-  if (status === 'unauthenticated') {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center">
-          <p className="text-center text-lg">You must be logged in to rent a bike.</p>
+      <div className="w-full max-w-4xl mx-auto">
+        <div className={statusStyles} role="alert">
+          <p className="font-semibold">
+            {icon}
+            Application Status: <span className="font-bold">{applicationStatus}</span>
+          </p>
+          <p>{statusText}</p>
         </div>
       </div>
     );
-  }
+  };
 
-  // Render based on application status FIRST, if an application exists
-  if (hasApplication && applicationStatus !== 'APPROVED') {
+  const renderApplicationForm = () => {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold text-center mb-8">Bike Rental</h1>
-        {renderApplicationStatus()}
-        {submittedApplicationData && (
-           <div className="mt-8">
-            <button
-              onClick={() => setShowApplicationReceipt(!showApplicationReceipt)}
-              className="w-full bg-gray-200 text-gray-800 font-bold py-3 px-4 rounded-lg hover:bg-gray-300 transition duration-300 mb-4"
-            >
-              {showApplicationReceipt ? 'Hide' : 'View'} Submitted Application Receipt
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-4xl mx-auto">
+        <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-4">Bike Rental Application Form</h2>
+        <form onSubmit={handleApplicationSubmit} className="space-y-6">
+          {/* Personal Information */}
+          <fieldset className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <legend className="text-lg font-semibold text-gray-700 col-span-full mb-2">Personal Information</legend>
+            <div>
+              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">First Name</label>
+              <input type="text" id="firstName" name="firstName" value={applicationData.firstName} onChange={handleInputChange} required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+            </div>
+            <div>
+              <label htmlFor="middleName" className="block text-sm font-medium text-gray-700">Middle Name</label>
+              <input type="text" id="middleName" name="middleName" value={applicationData.middleName} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+            </div>
+            <div>
+              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">Last Name</label>
+              <input type="text" id="lastName" name="lastName" value={applicationData.lastName} onChange={handleInputChange} required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+            </div>
+            <div>
+              <label htmlFor="srCode" className="block text-sm font-medium text-gray-700">SR Code</label>
+              <input type="text" id="srCode" name="srCode" value={applicationData.srCode} onChange={handleInputChange} required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+            </div>
+             <div>
+              <label htmlFor="sex" className="block text-sm font-medium text-gray-700">Sex</label>
+              <select id="sex" name="sex" value={applicationData.sex} onChange={handleInputChange} required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <option value="">Select...</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+            </div>
+            <div>
+              <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700">Date of Birth</label>
+              <input type="date" id="dateOfBirth" name="dateOfBirth" value={applicationData.dateOfBirth} onChange={handleInputChange} required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+            </div>
+             <div>
+              <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">Phone Number</label>
+              <input type="tel" id="phoneNumber" name="phoneNumber" value={applicationData.phoneNumber} onChange={handleInputChange} required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+            </div>
+             <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+              <input type="email" id="email" name="email" value={applicationData.email} onChange={handleInputChange} required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+            </div>
+          </fieldset>
+
+          {/* Academic and Lifestyle */}
+          <fieldset className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <legend className="text-lg font-semibold text-gray-700 col-span-full mb-2">Academic & Lifestyle</legend>
+            <div>
+              <label htmlFor="collegeProgram" className="block text-sm font-medium text-gray-700">College/Program</label>
+              <input type="text" id="collegeProgram" name="collegeProgram" value={applicationData.collegeProgram} onChange={handleInputChange} required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+            </div>
+            <div>
+              <label htmlFor="gwaLastSemester" className="block text-sm font-medium text-gray-700">GWA (Last Semester)</label>
+              <input type="number" step="0.01" id="gwaLastSemester" name="gwaLastSemester" value={applicationData.gwaLastSemester} onChange={handleInputChange} required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+            </div>
+            <div className="md:col-span-2">
+              <label htmlFor="extracurricularActivities" className="block text-sm font-medium text-gray-700">Extracurricular Activities</label>
+              <textarea id="extracurricularActivities" name="extracurricularActivities" rows={3} value={applicationData.extracurricularActivities} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+            </div>
+          </fieldset>
+
+          {/* Address Information */}
+          <fieldset className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <legend className="text-lg font-semibold text-gray-700 col-span-full mb-2">Address</legend>
+            <div>
+              <label htmlFor="houseNo" className="block text-sm font-medium text-gray-700">House No./Bldg</label>
+              <input type="text" id="houseNo" name="houseNo" value={applicationData.houseNo} onChange={handleInputChange} required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+            </div>
+            <div>
+              <label htmlFor="streetName" className="block text-sm font-medium text-gray-700">Street Name</label>
+              <input type="text" id="streetName" name="streetName" value={applicationData.streetName} onChange={handleInputChange} required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+            </div>
+            <div>
+              <label htmlFor="barangay" className="block text-sm font-medium text-gray-700">Barangay</label>
+              <input type="text" id="barangay" name="barangay" value={applicationData.barangay} onChange={handleInputChange} required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+            </div>
+            <div>
+              <label htmlFor="municipalityCity" className="block text-sm font-medium text-gray-700">Municipality/City</label>
+              <input type="text" id="municipalityCity" name="municipalityCity" value={applicationData.municipalityCity} onChange={handleInputChange} required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+            </div>
+             <div>
+              <label htmlFor="province" className="block text-sm font-medium text-gray-700">Province</label>
+              <input type="text" id="province" name="province" value={applicationData.province} onChange={handleInputChange} required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+            </div>
+             <div>
+              <label htmlFor="distanceFromCampus" className="block text-sm font-medium text-gray-700">Distance from Campus (km)</label>
+              <input type="number" step="0.1" id="distanceFromCampus" name="distanceFromCampus" value={applicationData.distanceFromCampus} onChange={handleInputChange} required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+            </div>
+          </fieldset>
+
+          {/* Financial and Usage Information */}
+          <fieldset className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <legend className="text-lg font-semibold text-gray-700 col-span-full mb-2">Financial & Usage</legend>
+            <div>
+              <label htmlFor="monthlyFamilyIncome" className="block text-sm font-medium text-gray-700">Monthly Family Income</label>
+              <select id="monthlyFamilyIncome" name="monthlyFamilyIncome" value={applicationData.monthlyFamilyIncome} onChange={handleInputChange} required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <option value="">Select...</option>
+                <option value="Below 10,000">Below ₱10,000</option>
+                <option value="10,001 - 20,000">₱10,001 - ₱20,000</option>
+                <option value="20,001 - 50,000">₱20,001 - ₱50,000</option>
+                <option value="Above 50,000">Above ₱50,000</option>
+              </select>
+            </div>
+            <div>
+              <label htmlFor="durationOfUse" className="block text-sm font-medium text-gray-700">Intended Duration of Use</label>
+              <select id="durationOfUse" name="durationOfUse" value={applicationData.durationOfUse} onChange={handleInputChange} required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <option value="">Select...</option>
+                <option value="One-time">One-time Rental</option>
+                <option value="Weekly">Weekly</option>
+                <option value="Monthly">Monthly</option>
+                <option value="Semester">Entire Semester</option>
+              </select>
+            </div>
+          </fieldset>
+          
+          <div className="flex justify-end pt-6 border-t">
+            <button type="submit" disabled={isSubmittingApplication} className="btn-primary">
+              {isSubmittingApplication ? 'Submitting...' : 'Submit Application'}
             </button>
-            {showApplicationReceipt && (
-              <div className="bg-white p-6 rounded-lg shadow-md prose max-w-none">
-                <h3 className="text-xl font-bold mb-4">Your Application Details</h3>
-                <pre className="bg-gray-100 p-4 rounded">{JSON.stringify(submittedApplicationData, null, 2)}</pre>
-              </div>
-            )}
           </div>
-        )}
+        </form>
+      </div>
+    );
+  };
+  
+  const renderBikes = () => {
+    return (
+      <>
+        <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Available Bikes</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {bikes.map((bike) => (
+            <div key={bike.id} className="card p-6 flex flex-col justify-between hover:shadow-xl transition-shadow">
+              <div>
+                <h3 className="text-xl font-bold text-gray-800">Bike #{bike.bikeNumber}</h3>
+                <p className="text-gray-600 mb-2">{bike.model}</p>
+                <span
+                  className={`px-3 py-1 text-sm rounded-full font-semibold ${
+                    bike.status === 'AVAILABLE'
+                      ? 'bg-blue-100 text-blue-800'
+                      : 'bg-gray-200 text-gray-700'
+                  }`}
+                >
+                  {bike.status}
+                </span>
+              </div>
+              <div className="mt-4">
+                <button
+                  onClick={() => handleRentBike(bike.id)}
+                  disabled={bike.status !== 'AVAILABLE' || isRenting}
+                  className="w-full btn-primary"
+                >
+                  {isRenting ? 'Processing...' : 'Rent This Bike'}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </>
+    );
+  };
+
+  if (status === 'loading' || isLoading) {
+    return <div className="text-center py-10 text-gray-600">Loading...</div>;
+  }
+  
+  if (error) {
+    return (
+      <div className="text-center py-10 text-red-600 bg-red-50 p-4 rounded-md">
+        <h3 className="font-bold text-lg mb-2">An Error Occurred</h3>
+        <p>{error}</p>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8 text-green-800">Rent a Bike</h1>
+    <div className="container mx-auto p-4 md:p-8 bg-gray-100 min-h-screen">
 
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg mb-6">
-          {error}
-        </div>
-      )}
-
-      {/* Quick Action Buttons */}
-      <div className="flex flex-wrap gap-4 mb-8">
-        {submittedApplicationData && (
-          <button
-            onClick={() => setShowApplicationReceipt(!showApplicationReceipt)}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium flex items-center space-x-2"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <span>{showApplicationReceipt ? 'Hide' : 'View'} Application Receipt</span>
-          </button>
-        )}
-        
-        {currentRental && (
-          <button
-            onClick={() => setShowRentalStatus(!showRentalStatus)}
-            className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-medium flex items-center space-x-2"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>{showRentalStatus ? 'Hide' : 'View'} Rental Status</span>
-          </button>
-        )}
-      </div>
-
-      {/* Application Receipt */}
-      {showApplicationReceipt && submittedApplicationData && (
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-8 border-l-4 border-blue-600">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-blue-800">Application Receipt</h2>
-            <div className="flex space-x-3">
-              <button
-                onClick={() => setShowApplicationReceipt(false)}
-                className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 font-medium"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-          
-                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-             <div className="bg-gray-50 p-4 rounded-lg">
-               <h3 className="text-lg font-bold text-blue-800 mb-4 border-b-2 border-blue-200 pb-2">Personal Information</h3>
-               <div className="space-y-3">
-                 <div className="flex flex-col">
-                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Full Name</span>
-                   <span className="text-base font-bold text-gray-900 mt-1">{submittedApplicationData.firstName} {submittedApplicationData.middleName} {submittedApplicationData.lastName}</span>
-                 </div>
-                 <div className="flex flex-col">
-                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">SR Code</span>
-                   <span className="text-base font-bold text-gray-900 mt-1">{submittedApplicationData.srCode}</span>
-                 </div>
-                 <div className="flex flex-col">
-                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Sex</span>
-                   <span className="text-base font-bold text-gray-900 mt-1">{submittedApplicationData.sex}</span>
-                 </div>
-                 <div className="flex flex-col">
-                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Date of Birth</span>
-                   <span className="text-base font-bold text-gray-900 mt-1">{new Date(submittedApplicationData.dateOfBirth).toLocaleDateString()}</span>
-                 </div>
-                 <div className="flex flex-col">
-                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Phone Number</span>
-                   <span className="text-base font-bold text-gray-900 mt-1">{submittedApplicationData.phoneNumber}</span>
-                 </div>
-                 <div className="flex flex-col">
-                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Email Address</span>
-                   <span className="text-base font-bold text-blue-600 mt-1">{submittedApplicationData.email}</span>
-                 </div>
-               </div>
-             </div>
-             <div className="bg-gray-50 p-4 rounded-lg">
-               <h3 className="text-lg font-bold text-blue-800 mb-4 border-b-2 border-blue-200 pb-2">Academic & Other Details</h3>
-               <div className="space-y-3">
-                 <div className="flex flex-col">
-                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">College/Program</span>
-                   <span className="text-base font-bold text-gray-900 mt-1">{submittedApplicationData.collegeProgram}</span>
-                 </div>
-                 <div className="flex flex-col">
-                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">GWA Last Semester</span>
-                   <span className="text-base font-bold text-green-600 mt-1">{submittedApplicationData.gwaLastSemester || 'Not provided'}</span>
-                 </div>
-                 <div className="flex flex-col">
-                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Distance from Campus</span>
-                   <span className="text-base font-bold text-gray-900 mt-1">{submittedApplicationData.distanceFromCampus}</span>
-                 </div>
-                 <div className="flex flex-col">
-                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Duration of Use</span>
-                   <span className="text-base font-bold text-gray-900 mt-1">{submittedApplicationData.durationOfUse}</span>
-                 </div>
-                 <div className="flex flex-col">
-                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Home Address</span>
-                   <span className="text-sm font-medium text-gray-900 mt-1 leading-relaxed">
-                     {submittedApplicationData.houseNo} {submittedApplicationData.streetName}<br/>
-                     {submittedApplicationData.barangay}, {submittedApplicationData.municipalityCity}<br/>
-                     {submittedApplicationData.province}
-                   </span>
-                 </div>
-                 {submittedApplicationData.extracurricularActivities && (
-                   <div className="flex flex-col">
-                     <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Extracurricular Activities</span>
-                     <span className="text-sm font-medium text-gray-900 mt-1">{submittedApplicationData.extracurricularActivities}</span>
-                   </div>
-                 )}
-                 {submittedApplicationData.monthlyFamilyIncome && (
-                   <div className="flex flex-col">
-                     <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Monthly Family Income</span>
-                     <span className="text-base font-bold text-green-600 mt-1">₱{parseFloat(submittedApplicationData.monthlyFamilyIncome).toLocaleString()}</span>
-                   </div>
-                 )}
-               </div>
-             </div>
-           </div>
-          
-          <div className="mt-6 p-4 bg-green-50 rounded-lg">
-            <div className="flex items-center space-x-2">
-              <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              <span className="text-green-800 font-medium">Application Status: Submitted Successfully</span>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Rental Status */}
-      {showRentalStatus && currentRental && (
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-8 border-l-4 border-green-600">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-green-800">Current Rental Status</h2>
-            <button
-              onClick={() => setShowRentalStatus(false)}
-              className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 font-medium"
+      {/* Buttons for Application Receipt and Rental Status */}
+      {(hasApplication || currentRental) && (
+        <div className="w-full max-w-4xl mx-auto mb-6 flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+          {hasApplication && (
+            <button 
+              onClick={() => setShowApplicationReceipt(!showApplicationReceipt)}
+              className="w-full flex justify-between items-center p-4 bg-white rounded-lg shadow-md hover:bg-gray-50 transition-colors"
             >
-              Close
+              <div className="flex items-center">
+                <FileText className="mr-3 text-blue-600" />
+                <span className="font-semibold text-gray-800">View Submitted Application</span>
+              </div>
+              {showApplicationReceipt ? <ChevronUp /> : <ChevronDown />}
             </button>
-          </div>
-          
-                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-             <div className="bg-gray-50 p-4 rounded-lg">
-               <h3 className="text-lg font-bold text-green-800 mb-4 border-b-2 border-green-200 pb-2">Rental Details</h3>
-               <div className="space-y-3">
-                 <div className="flex flex-col">
-                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Bike Number</span>
-                   <span className="text-lg font-bold text-gray-900 mt-1">#{currentRental.bike.bikeNumber}</span>
-                 </div>
-                 <div className="flex flex-col">
-                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Model</span>
-                   <span className="text-base font-bold text-gray-900 mt-1">{currentRental.bike.model}</span>
-                 </div>
-                 <div className="flex flex-col">
-                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Start Time</span>
-                   <span className="text-base font-bold text-gray-900 mt-1">{new Date(currentRental.startTime).toLocaleString()}</span>
-                 </div>
-                 <div className="flex flex-col">
-                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Status</span>
-                   <span className="mt-1">
-                     <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-bold uppercase">
-                       {currentRental.status}
-                     </span>
-                   </span>
-                 </div>
-                 {currentRental.distance && (
-                   <div className="flex flex-col">
-                     <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Distance Traveled</span>
-                     <span className="text-base font-bold text-blue-600 mt-1">{currentRental.distance.toFixed(2)} km</span>
-                   </div>
-                 )}
-                 {currentRental.carbonSaved && (
-                   <div className="flex flex-col">
-                     <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Carbon Saved</span>
-                     <span className="text-base font-bold text-green-600 mt-1">{currentRental.carbonSaved.toFixed(2)} kg CO₂</span>
-                   </div>
-                 )}
-               </div>
-             </div>
-                         <div className="bg-gray-50 p-4 rounded-lg">
-               <h3 className="text-lg font-bold text-green-800 mb-4 border-b-2 border-green-200 pb-2">Quick Actions</h3>
-               <div className="space-y-4">
-                 <button
-                   onClick={handleExtendRental}
-                   disabled={isExtendingRental}
-                   className={`w-full px-4 py-3 rounded-lg font-bold text-sm uppercase tracking-wide transition-all duration-200 ${
-                     isExtendingRental 
-                       ? 'bg-gray-400 cursor-not-allowed text-gray-700' 
-                       : 'bg-blue-600 hover:bg-blue-700 hover:shadow-lg text-white'
-                   }`}
-                 >
-                   <div className="flex items-center justify-center space-x-2">
-                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                     </svg>
-                     <span>{isExtendingRental ? 'Extending...' : 'Extend Rental (+2 hours)'}</span>
-                   </div>
-                 </button>
-                 <button
-                   onClick={handleEndRental}
-                   className="w-full bg-red-600 text-white px-4 py-3 rounded-lg hover:bg-red-700 hover:shadow-lg font-bold text-sm uppercase tracking-wide transition-all duration-200"
-                 >
-                   <div className="flex items-center justify-center space-x-2">
-                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m0 0a9 9 0 01-9-9m9 9v-9" />
-                     </svg>
-                     <span>End Rental</span>
-                   </div>
-                 </button>
-                 <button
-                   onClick={() => window.location.href = '/rent/active'}
-                   className="w-full bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 hover:shadow-lg font-bold text-sm uppercase tracking-wide transition-all duration-200"
-                 >
-                   <div className="flex items-center justify-center space-x-2">
-                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                     </svg>
-                     <span>View Live Tracking</span>
-                   </div>
-                 </button>
-               </div>
-             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Progress Steps */}
-      <div className="flex items-center justify-center mb-8">
-        <div className="flex items-center">
-          <div className={`flex items-center justify-center w-10 h-10 rounded-full text-white font-medium ${
-            currentStep === 'application' || hasApplication ? 'bg-green-600' : 'bg-gray-300'
-          }`}>
-            1
-          </div>
-          <span className="ml-2 text-sm font-medium text-gray-700">Application Form</span>
-        </div>
-        <div className="w-16 h-1 bg-gray-200 mx-4">
-          <div className={`h-1 transition-all duration-300 ${
-            hasApplication ? 'bg-green-600 w-full' : 'bg-gray-200 w-0'
-          }`}></div>
-        </div>
-        <div className="flex items-center">
-          <div className={`flex items-center justify-center w-10 h-10 rounded-full text-white font-medium ${
-            currentStep === 'bikes' && hasApplication ? 'bg-green-600' : 'bg-gray-300'
-          }`}>
-            2
-          </div>
-          <span className="ml-2 text-sm font-medium text-gray-700">Select Bike</span>
-        </div>
-      </div>
-
-      {currentStep === 'application' && !hasApplication && (
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-green-800">Bike Rental Application Form</h2>
-          </div>
-          
-          <form onSubmit={handleApplicationSubmit} className="space-y-6">
-            {/* Personal Information */}
-            <div className="border-l-4 border-green-600 pl-4">
-              <h3 className="text-lg font-semibold text-green-800 mb-4">Personal Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    First Name *
-                  </label>
-                  <input
-                    type="text"
-                    name="firstName"
-                    value={applicationData.firstName}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="Enter your first name"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Last Name *
-                  </label>
-                  <input
-                    type="text"
-                    name="lastName"
-                    value={applicationData.lastName}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="Enter your last name"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Middle Name
-                  </label>
-                  <input
-                    type="text"
-                    name="middleName"
-                    value={applicationData.middleName}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="Enter your middle name"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    SR Code *
-                  </label>
-                  <input
-                    type="text"
-                    name="srCode"
-                    value={applicationData.srCode}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="e.g., 20-12345"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Sex *
-                  </label>
-                  <select
-                    name="sex"
-                    value={applicationData.sex}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  >
-                    <option value="">Select sex</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Date of Birth *
-                  </label>
-                  <input
-                    type="date"
-                    name="dateOfBirth"
-                    value={applicationData.dateOfBirth}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Phone Number *
-                  </label>
-                  <input
-                    type="tel"
-                    name="phoneNumber"
-                    value={applicationData.phoneNumber}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="e.g., +63 912 345 6789"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email Address *
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={applicationData.email}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="Enter your email"
-                  />
-                </div>
+          )}
+          {currentRental && (
+             <button 
+              onClick={() => setShowRentalStatus(!showRentalStatus)}
+              className="w-full flex justify-between items-center p-4 bg-white rounded-lg shadow-md hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center">
+                <Clock className="mr-3 text-blue-600" />
+                <span className="font-semibold text-gray-800">Manage Current Rental</span>
               </div>
-            </div>
-
-            {/* Academic Information */}
-            <div className="border-l-4 border-green-600 pl-4">
-              <h3 className="text-lg font-semibold text-green-800 mb-4">Academic Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    College/Program *
-                  </label>
-                  <input
-                    type="text"
-                    name="collegeProgram"
-                    value={applicationData.collegeProgram}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="e.g., BS Computer Science"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    GWA Last Semester
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="1.00"
-                    max="5.00"
-                    name="gwaLastSemester"
-                    value={applicationData.gwaLastSemester}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="e.g., 1.75"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Extracurricular Activities
-                  </label>
-                  <textarea
-                    name="extracurricularActivities"
-                    value={applicationData.extracurricularActivities}
-                    onChange={handleInputChange}
-                    rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="List your extracurricular activities, if any"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Address Information */}
-            <div className="border-l-4 border-green-600 pl-4">
-              <h3 className="text-lg font-semibold text-green-800 mb-4">Present Home Address</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    House No. *
-                  </label>
-                  <input
-                    type="text"
-                    name="houseNo"
-                    value={applicationData.houseNo}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="House/Lot/Block No."
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Street Name *
-                  </label>
-                  <input
-                    type="text"
-                    name="streetName"
-                    value={applicationData.streetName}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="Street name"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Barangay *
-                  </label>
-                  <input
-                    type="text"
-                    name="barangay"
-                    value={applicationData.barangay}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="Barangay"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Municipality/City *
-                  </label>
-                  <input
-                    type="text"
-                    name="municipalityCity"
-                    value={applicationData.municipalityCity}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="Municipality or City"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Province *
-                  </label>
-                  <input
-                    type="text"
-                    name="province"
-                    value={applicationData.province}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="Province"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Distance from Campus *
-                  </label>
-                  <select
-                    name="distanceFromCampus"
-                    value={applicationData.distanceFromCampus}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  >
-                    <option value="">Select distance</option>
-                    <option value="Less than 1 km">Less than 1 km</option>
-                    <option value="1 km but less than 5 km">1 km but less than 5 km</option>
-                    <option value="5 km and above">5 km and above</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* Financial & Usage Information */}
-            <div className="border-l-4 border-green-600 pl-4">
-              <h3 className="text-lg font-semibold text-green-800 mb-4">Financial & Usage Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Monthly Family Income
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    name="monthlyFamilyIncome"
-                    value={applicationData.monthlyFamilyIncome}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="Enter amount in PHP"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Intended Duration of Use *
-                  </label>
-                  <select
-                    name="durationOfUse"
-                    value={applicationData.durationOfUse}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  >
-                    <option value="">Select duration</option>
-                    <option value="One Semester">One Semester</option>
-                    <option value="Others">Others</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-end space-x-4">
-              <button
-                type="submit"
-                disabled={isSubmittingApplication}
-                className={`px-6 py-3 rounded-lg text-white font-medium ${
-                  isSubmittingApplication 
-                    ? 'bg-gray-400 cursor-not-allowed' 
-                    : 'bg-green-600 hover:bg-green-700'
-                }`}
-              >
-                {isSubmittingApplication ? 'Submitting...' : 'Submit Application'}
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {(currentStep === 'bikes' || hasApplication) && (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Bike List Section */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold mb-4 text-green-800">Available Bikes</h2>
-          {isLoading ? (
-            <div className="space-y-4">
-              {[1, 2, 3].map((n) => (
-                <div
-                  key={n}
-                  className="h-24 bg-gray-100 animate-pulse rounded-lg"
-                />
-              ))}
-            </div>
-          ) : bikes.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              No bikes available at the moment.
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {bikes.map((bike) => (
-                <div
-                  key={bike.id}
-                  className="p-4 rounded-lg border border-green-200"
-                >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-semibold text-green-800">Bike #{bike.bikeNumber}</h3>
-                      <p className="text-sm text-gray-600">{bike.model}</p>
-                      <span
-                        className={`inline-block px-2 py-1 text-xs rounded-full ${
-                          bike.status === 'AVAILABLE'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}
-                      >
-                        {bike.status}
-                      </span>
-                    </div>
-                    {bike.status === 'AVAILABLE' && (
-                      <button
-                        onClick={() => handleRentBike(bike.id)}
-                        disabled={isRenting}
-                        className={`px-4 py-2 rounded-lg text-white font-medium ${
-                          isRenting 
-                            ? 'bg-gray-400 cursor-not-allowed' 
-                            : 'bg-green-600 hover:bg-green-700'
-                        }`}
-                      >
-                        {isRenting ? 'Renting...' : 'Rent'}
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
+              {showRentalStatus ? <ChevronUp /> : <ChevronDown />}
+            </button>
           )}
         </div>
+      )}
+      
+      {/* Collapsible Application Receipt */}
+      {showApplicationReceipt && submittedApplicationData && (
+        <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-4xl mx-auto mb-6">
+          <h3 className="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">Application Receipt</h3>
+          <pre className="bg-gray-50 p-4 rounded-md overflow-x-auto text-sm text-gray-700">
+            {JSON.stringify(submittedApplicationData, null, 2)}
+          </pre>
+        </div>
+      )}
 
-        {/* Info Section */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold mb-4 text-green-800">How to Rent</h2>
-          <div className="space-y-3 text-gray-600">
-            <div className="flex items-start">
-              <span className="flex-shrink-0 w-6 h-6 bg-green-100 text-green-800 rounded-full flex items-center justify-center text-sm font-medium mr-3">1</span>
-              <p>Choose an available bike from the list</p>
-            </div>
-            <div className="flex items-start">
-              <span className="flex-shrink-0 w-6 h-6 bg-green-100 text-green-800 rounded-full flex items-center justify-center text-sm font-medium mr-3">2</span>
-              <p>Click the "Rent" button to start your rental</p>
-            </div>
-            <div className="flex items-start">
-              <span className="flex-shrink-0 w-6 h-6 bg-green-100 text-green-800 rounded-full flex items-center justify-center text-sm font-medium mr-3">3</span>
-              <p>You'll be redirected to your active rental page</p>
-            </div>
-            <div className="flex items-start">
-              <span className="flex-shrink-0 w-6 h-6 bg-green-100 text-green-800 rounded-full flex items-center justify-center text-sm font-medium mr-3">4</span>
-              <p>End your rental when you're done</p>
+      {/* Collapsible Rental Status */}
+      {showRentalStatus && currentRental && (
+        <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-4xl mx-auto mb-6">
+          <h3 className="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">Rental Status</h3>
+          <div className="space-y-3 text-gray-700">
+            <p><span className="font-semibold text-gray-800">Bike Model:</span> {currentRental.bike.model}</p>
+            <p><span className="font-semibold text-gray-800">Bike Number:</span> {currentRental.bike.bikeNumber}</p>
+            <p><span className="font-semibold text-gray-800">Start Time:</span> {new Date(currentRental.startTime).toLocaleString()}</p>
+            <div className="flex space-x-4 pt-4 border-t mt-4">
+              <button onClick={handleExtendRental} disabled={isExtendingRental} className="btn-secondary">
+                {isExtendingRental ? 'Extending...' : 'Extend Rental (1 hr)'}
+              </button>
+              <button onClick={handleEndRental} className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 font-semibold">
+                End Rental
+              </button>
             </div>
           </div>
+        </div>
+      )}
 
-            {session && (
-              <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h3 className="font-semibold text-blue-800 mb-2">Account Info</h3>
-            <p className="text-sm text-blue-700">
-                  Logged in as: {session.user?.email}
-            </p>
-              </div>
-            )}
-          </div>
+      {renderApplicationStatus()}
+      
+      {currentStep === 'application' && !hasApplication && (
+        renderApplicationForm()
+      )}
+
+      {currentStep === 'bikes' && (
+        <div className="w-full max-w-6xl mx-auto">
+          {renderBikes()}
         </div>
       )}
     </div>
