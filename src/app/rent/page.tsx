@@ -313,6 +313,7 @@ export default function RentPage() {
           <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4" role="alert">
             <p className="font-bold">Application Under Review</p>
             <p>Your application is currently being reviewed by our administrators. You will be notified via email once a decision has been made. You can view your submitted application details below.</p>
+            {/* eslint-disable-next-line react/no-unescaped-entities */}
             <p>Please check back later or wait for an email for an update on your application&apos;s status.</p>
             <p className="mt-2">If you have any urgent questions, please don&apos;t hesitate to contact our support team at <a href="mailto:support@example.com" className="font-medium underline">support@example.com</a>.</p>
           </div>
