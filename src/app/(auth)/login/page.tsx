@@ -76,7 +76,7 @@ function LoginForm() {
       </div>
 
       <div className="bg-blue-600 py-2">
-        <p className="text-center text-white text-sm">Spartan&apos;s Pedal Access & Rental Transport Assistant
+        <p className="text-center text-white text-sm">Spartans&apos; Pedal Access & Rental Transport Assistant
         </p>
       </div>
       
@@ -102,7 +102,7 @@ function LoginForm() {
                   type="email"
                   autoComplete="email"
                   required
-                  className="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-md bg-black text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-md bg-white text-black placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   placeholder="Email"
                 />
               </div>
@@ -116,7 +116,7 @@ function LoginForm() {
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   required
-                  className="w-full pl-12 pr-10 py-2 border border-gray-300 rounded-md bg-black text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full pl-12 pr-10 py-2 border border-gray-300 rounded-md bg-white text-black placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   placeholder="Password"
                 />
                 <button

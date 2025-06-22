@@ -98,7 +98,7 @@ export default function RegisterPage() {
                   name="name"
                   type="text"
                   required
-                  className="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-md bg-black text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-md bg-white text-black placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   placeholder="Full Name"
                 />
               </div>
@@ -113,7 +113,7 @@ export default function RegisterPage() {
                   type="email"
                   autoComplete="email"
                   required
-                  className="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-md bg-black text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-md bg-white text-black placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   placeholder="Email"
                 />
               </div>
@@ -128,7 +128,7 @@ export default function RegisterPage() {
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="new-password"
                   required
-                  className="w-full pl-12 pr-10 py-2 border border-gray-300 rounded-md bg-black text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full pl-12 pr-10 py-2 border border-gray-300 rounded-md bg-white text-black placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   placeholder="Password"
                 />
                 <button
@@ -149,12 +149,13 @@ export default function RegisterPage() {
                   id="role"
                   name="role"
                   required
-                  className="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-md bg-black text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  defaultValue=""
+                  className="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-md bg-white text-black invalid:text-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 >
                   <option value="" disabled>Select your role</option>
-                  <option value="STUDENT">Student</option>
-                  <option value="TEACHING_STAFF">Teaching Staff</option>
-                  <option value="NON_TEACHING_STAFF">Non-Teaching Staff</option>
+                  <option value="STUDENT" className="text-black">Student</option>
+                  <option value="TEACHING_STAFF" className="text-black">Teaching Staff</option>
+                  <option value="NON_TEACHING_STAFF" className="text-black">Non-Teaching Staff</option>
                 </select>
               </div>
 
