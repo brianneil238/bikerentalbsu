@@ -45,7 +45,7 @@ export default function HomePage() {
           <li>Sign up or log in with your university account.</li>
           <li>Submit a rental application and wait for approval.</li>
           <li>Once approved, choose an available bike and start riding!</li>
-          <li>Return the bike to any campus station when you're done.</li>
+          <li>Return the bike to any campus station when you&apos;re done.</li>
         </ol>
       </div>
 
