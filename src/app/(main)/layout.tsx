@@ -1,4 +1,5 @@
 import React from 'react';
+import { NavigationWrapper } from '@/components/NavigationWrapper';
 
 export default function MainLayout({
   children,
@@ -7,6 +8,7 @@ export default function MainLayout({
 }) {
   return (
     <>
+      <NavigationWrapper />
       {children}
     </>
   );
