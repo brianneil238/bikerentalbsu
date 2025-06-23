@@ -70,12 +70,6 @@ export function Navigation() {
                 >
                   Login
                 </Link>
-                <Link
-                  href="/register"
-                  className="btn-primary"
-                >
-                  Register
-                </Link>
               </>
             )}
             {status === 'authenticated' && (
@@ -138,13 +132,6 @@ export function Navigation() {
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Login
-                  </Link>
-                  <Link
-                    href="/register"
-                    className="block btn-primary text-center"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Register
                   </Link>
                 </>
               )}
