@@ -1,46 +1,36 @@
-import { withAuth } from 'next-auth/middleware';
-import { NextResponse } from 'next/server';
+import { getToken } from 'next-auth/jwt';
+import { NextRequest, NextResponse } from 'next/server';
 
-export default withAuth(
-  function middleware(req) {
-    const token = req.nextauth.token;
+export async function middleware(req: NextRequest) {
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  const { pathname } = req.nextUrl;
 
-    // Role-based access control for admin routes
-    if (req.nextUrl.pathname.startsWith('/admin') && token?.role !== 'ADMIN') {
+  const isAuthPage = pathname.startsWith('/login') || pathname.startsWith('/register');
+
+  // If the user is authenticated
+  if (token) {
+    // If they are on an auth page, redirect them to the home page
+    if (isAuthPage) {
       return NextResponse.redirect(new URL('/', req.url));
     }
-
-    return NextResponse.next();
-  },
-  {
-    callbacks: {
-      authorized: ({ req, token }) => {
-        const { pathname } = req.nextUrl;
-        
-        // Allow unauthenticated access to auth pages
-        if (pathname.startsWith('/login') || pathname.startsWith('/register')) {
-          // If user is already logged in, redirect away from auth pages
-          if (token) {
-            return false; // This will trigger redirect to '/'
-          }
-          return true; // Allow access for unauthenticated users
-        }
-
-        // For any other page, user must be authenticated
-        return !!token;
-      },
-    },
-    pages: {
-      signIn: '/login',
-      // If an authorized callback returns false, user is redirected to the home page
-      error: '/', 
-    },
+    // Handle admin role access
+    if (pathname.startsWith('/admin') && token.role !== 'ADMIN') {
+      return NextResponse.redirect(new URL('/', req.url));
+    }
+  } 
+  // If the user is not authenticated
+  else {
+    // And they are not on an auth page, redirect them to the login page
+    if (!isAuthPage) {
+      return NextResponse.redirect(new URL('/login', req.url));
+    }
   }
-);
+
+  // Allow the request to proceed
+  return NextResponse.next();
+}
 
 export const config = {
-  // Apply middleware to all routes except static assets and API routes
-  matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
-  ],
+  // Match all paths except for static assets and API routes
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
 }; 
