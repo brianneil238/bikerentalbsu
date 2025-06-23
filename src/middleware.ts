@@ -5,34 +5,42 @@ export default withAuth(
   function middleware(req) {
     const token = req.nextauth.token;
 
-    // If authenticated user tries to access login/register, redirect to dashboard
-    const isAuthPage = req.nextUrl.pathname.startsWith('/login') ||
-                       req.nextUrl.pathname.startsWith('/register');
-    if (isAuthPage && token) {
-      return NextResponse.redirect(new URL('/dashboard', req.url));
-    }
-
     // Role-based access control for admin routes
     if (req.nextUrl.pathname.startsWith('/admin') && token?.role !== 'ADMIN') {
-      return NextResponse.redirect(new URL('/dashboard', req.url));
+      return NextResponse.redirect(new URL('/', req.url));
     }
 
-    // Continue to the requested page
     return NextResponse.next();
   },
   {
     callbacks: {
-      // This callback is for NextAuth.js to determine if a user is authorized for a matched route.
-      // We want to apply authentication to all routes in 'matcher'.
-      // If unauthorized, NextAuth.js will redirect to `pages.signIn`.
-      authorized: ({ token }) => !!token,
+      authorized: ({ req, token }) => {
+        const { pathname } = req.nextUrl;
+        
+        // Allow unauthenticated access to auth pages
+        if (pathname.startsWith('/login') || pathname.startsWith('/register')) {
+          // If user is already logged in, redirect away from auth pages
+          if (token) {
+            return false; // This will trigger redirect to '/'
+          }
+          return true; // Allow access for unauthenticated users
+        }
+
+        // For any other page, user must be authenticated
+        return !!token;
+      },
     },
     pages: {
-      signIn: '/login', // Specify the login page for NextAuth.js to redirect to
+      signIn: '/login',
+      // If an authorized callback returns false, user is redirected to the home page
+      error: '/', 
     },
   }
 );
 
 export const config = {
-  matcher: ['/', '/rent', '/admin', '/rent/active'],
+  // Apply middleware to all routes except static assets and API routes
+  matcher: [
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+  ],
 }; 

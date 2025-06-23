@@ -23,7 +23,7 @@ export function Navigation() {
     navItems = [
       { href: '/', label: 'Home' },
       { href: '/rent', label: 'Rent a Bike' },
-      { href: '/rent', label: 'Dashboard' },
+      { href: '/rent/active', label: 'My Rentals' },
       { href: '/about', label: 'About' },
     ];
   }
