@@ -1,5 +1,4 @@
 import React from 'react';
-import { Navigation } from '@/components/Navigation';
 
 export default function MainLayout({
   children,
@@ -8,7 +7,6 @@ export default function MainLayout({
 }) {
   return (
     <>
-      <Navigation />
       {children}
     </>
   );
