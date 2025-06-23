@@ -39,7 +39,15 @@ export function Navigation() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center text-xl font-bold text-red-700 hover:text-red-800 transition-colors">
-            <Image src="/spartan_logo.png" alt="Sparta Logo" width={40} height={40} className="mr-2" />
+            <Image 
+              src="/spartan_logo.png" 
+              alt="Sparta Logo" 
+              width={40} 
+              height={40} 
+              className="mr-2"
+              priority
+              unoptimized
+            />
             SPARTA
           </Link>
 

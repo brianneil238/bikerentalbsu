@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { Mail, Lock, HelpCircle, Eye, EyeOff } from 'lucide-react';
 import Image from 'next/image';
@@ -10,9 +11,17 @@ import Image from 'next/image';
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { data: session, status } = useSession();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (status === 'authenticated') {
+      router.replace('/');
+    }
+  }, [status, router]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -56,6 +65,11 @@ function LoginForm() {
   };
 
   const registered = searchParams?.get('registered');
+
+  // Show nothing while checking session
+  if (status === 'loading' || status === 'authenticated') {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col font-sans">
