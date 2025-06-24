@@ -11,10 +11,7 @@ export default function HomePage() {
         <p className="text-lg md:text-xl text-gray-700 mb-6">Sustainable, affordable, and fun bike rentals for Batangas State University - TNEU.</p>
         <div className="flex flex-col md:flex-row gap-4 justify-center">
           <Link href="/rent">
-            <span className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-lg shadow transition">Rent a Bike</span>
-          </Link>
-          <Link href="/rent/active">
-            <span className="inline-block bg-white border border-blue-600 text-blue-700 font-semibold px-8 py-3 rounded-lg shadow hover:bg-blue-50 transition">My Rentals</span>
+            <span className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-lg shadow transition">Get Started</span>
           </Link>
         </div>
       </div>
