@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { Leaf, Wallet, MapPin } from 'lucide-react';
 
 export default function HomePage() {
   return (
@@ -22,17 +22,17 @@ export default function HomePage() {
       {/* Feature Highlights */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 w-full max-w-5xl">
         <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center">
-          <Image src="/spartan_logo.png" alt="Eco Friendly" width={60} height={60} className="mb-3" />
+          <Leaf className="w-14 h-14 text-green-600 mb-3" />
           <h3 className="text-xl font-bold text-green-700 mb-2">Eco-Friendly</h3>
           <p className="text-gray-600 text-center">Reduce your carbon footprint and help keep our campus green by choosing bikes over cars.</p>
         </div>
         <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center">
-          <svg className="w-14 h-14 text-blue-600 mb-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m4 0h-1v-4h-1m-4 0h-1v-4h-1m4 0h-1v-4h-1" /></svg>
+          <Wallet className="w-14 h-14 text-blue-600 mb-3" />
           <h3 className="text-xl font-bold text-blue-700 mb-2">Affordable</h3>
           <p className="text-gray-600 text-center">Enjoy low-cost rentals designed for students and staff. No hidden fees, just easy rides.</p>
         </div>
         <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center">
-          <svg className="w-14 h-14 text-yellow-500 mb-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <MapPin className="w-14 h-14 text-yellow-500 mb-3" />
           <h3 className="text-xl font-bold text-yellow-600 mb-2">Convenient</h3>
           <p className="text-gray-600 text-center">Pick up and return bikes at multiple campus locations. Fast, simple, and always available.</p>
         </div>
