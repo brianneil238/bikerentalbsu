@@ -75,7 +75,7 @@ function LoginForm() {
     <div className="min-h-screen bg-gray-100 flex flex-col font-sans">
       {/* Hero Banner Section */}
       <div
-        className="relative w-full"
+        className="relative w-full flex flex-col items-center justify-center"
         style={{
           backgroundImage: "url('/hero-bg.png')",
           backgroundSize: 'cover',
@@ -83,22 +83,21 @@ function LoginForm() {
         }}
       >
         {/* Overlay */}
-        <div className="absolute inset-0 bg-black bg-opacity-60 z-0" />
+        <div className="absolute inset-0 bg-black bg-opacity-75 z-0" />
         {/* Content */}
-        <div className="relative z-10 container mx-auto px-4 py-6 flex items-center space-x-3">
+        <div className="relative z-10 container mx-auto px-4 py-8 flex flex-col items-center justify-center text-center">
           <Image 
             src="/spartan_logo.png" 
             alt="Sparta Logo" 
-            width={50} 
-            height={50} 
+            width={60} 
+            height={60} 
             priority
             unoptimized
+            className="mx-auto mb-2"
           />
-          <div>
-            <h1 className="text-lg font-bold text-red-700 drop-shadow">SPARTA</h1>
-            <p className="text-xs text-gray-100 drop-shadow">BATANGAS STATE UNIVERSITY - TNEU</p>
-            <h2 className="text-xl font-bold text-white drop-shadow">University Bike Rental</h2>
-          </div>
+          <h1 className="text-2xl font-bold text-red-700 drop-shadow mb-1">SPARTA</h1>
+          <p className="text-base text-gray-100 drop-shadow mb-1">BATANGAS STATE UNIVERSITY - TNEU</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-white drop-shadow mb-0">University Bike Rental</h2>
         </div>
       </div>
       {/* End Hero Banner Section */}
