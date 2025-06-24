@@ -4,7 +4,7 @@ import { Leaf, Wallet, MapPin } from 'lucide-react';
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-green-50 flex flex-col items-center py-10">
+    <div className="min-h-screen flex flex-col items-center py-10" style={{ backgroundColor: '#f7f7f7' }}>
       {/* Welcome Banner */}
       <div className="text-center mb-10">
         <h1 className="text-4xl md:text-5xl font-extrabold text-green-800 mb-4 drop-shadow-lg">Welcome to SPARTA Bike Rental!</h1>
