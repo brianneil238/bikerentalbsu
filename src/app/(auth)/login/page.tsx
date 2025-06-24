@@ -76,7 +76,14 @@ function LoginForm() {
       <header className="bg-white">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center space-x-3">
-            <Image src="/spartan_logo.png" alt="BSU Logo" width={50} height={50} />
+            <Image 
+              src="/spartan_logo.png" 
+              alt="Sparta Logo" 
+              width={50} 
+              height={50} 
+              priority
+              unoptimized
+            />
             <div>
               <h1 className="text-lg font-bold text-red-700">SPARTA</h1>
               <p className="text-xs text-gray-600">BATANGAS STATE UNIVERSITY - TNEU</p>
