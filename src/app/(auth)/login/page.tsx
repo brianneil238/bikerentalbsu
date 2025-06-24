@@ -73,24 +73,35 @@ function LoginForm() {
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col font-sans">
-      <header className="bg-white">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center space-x-3">
-            <Image 
-              src="/spartan_logo.png" 
-              alt="Sparta Logo" 
-              width={50} 
-              height={50} 
-              priority
-              unoptimized
-            />
-            <div>
-              <h1 className="text-lg font-bold text-red-700">SPARTA</h1>
-              <p className="text-xs text-gray-600">BATANGAS STATE UNIVERSITY - TNEU</p>
-            </div>
+      {/* Hero Banner Section */}
+      <div
+        className="relative w-full"
+        style={{
+          backgroundImage: "url('/hero-bg.png')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black bg-opacity-60 z-0" />
+        {/* Content */}
+        <div className="relative z-10 container mx-auto px-4 py-6 flex items-center space-x-3">
+          <Image 
+            src="/spartan_logo.png" 
+            alt="Sparta Logo" 
+            width={50} 
+            height={50} 
+            priority
+            unoptimized
+          />
+          <div>
+            <h1 className="text-lg font-bold text-red-700 drop-shadow">SPARTA</h1>
+            <p className="text-xs text-gray-100 drop-shadow">BATANGAS STATE UNIVERSITY - TNEU</p>
+            <h2 className="text-xl font-bold text-white drop-shadow">University Bike Rental</h2>
           </div>
         </div>
-      </header>
+      </div>
+      {/* End Hero Banner Section */}
 
       <div className="bg-white py-4 shadow-sm">
         <h2 className="text-center text-2xl font-bold text-gray-800 tracking-wide">University Bike Rental</h2>
