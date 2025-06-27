@@ -152,7 +152,7 @@ function LoginForm() {
             <div className="flex items-center justify-between p-3 border border-gray-200 rounded-md bg-gray-50">
               <div className="flex items-center">
                 <input type="checkbox" className="w-5 h-5 border-gray-400 rounded-sm" />
-                <span className="ml-2 text-sm text-gray-700">I'm not a robot</span>
+                <span className="ml-2 text-sm text-gray-700">I&apos;m not a robot</span>
               </div>
               <div className="text-xs text-gray-400 text-right">
                 reCAPTCHA
@@ -172,7 +172,7 @@ function LoginForm() {
             </div>
             <div className="text-center mt-6">
               <p className="text-sm">
-                <span className="text-gray-600">Don't have an account? </span>
+                <span className="text-gray-600">Don&apos;t have an account? </span>
                 <Link href="/register" className="font-semibold text-blue-700 hover:underline">
                   Sign Up
                 </Link>
