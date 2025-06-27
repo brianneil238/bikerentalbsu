@@ -75,7 +75,7 @@ function LoginForm() {
     <div className="min-h-screen w-full relative flex items-center justify-end bg-gray-100 font-sans overflow-hidden">
       {/* Background image */}
       <Image
-        src="/batstate-bg.jpg"
+        src="/batstateu-bg.jpg"
         alt="Campus background"
         fill
         priority
