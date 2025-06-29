@@ -55,7 +55,7 @@ export default function RegisterPage() {
     <div className="min-h-screen w-full relative flex items-center justify-end bg-gray-100 font-sans overflow-hidden">
       {/* Background image */}
       <Image
-        src="/CAR RENTAL APP.jpg"
+        src="/car-rental-app.jpg"
         alt="Campus background"
         fill
         priority
