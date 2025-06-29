@@ -54,13 +54,10 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen w-full relative flex items-center justify-end bg-gray-100 font-sans overflow-hidden">
       {/* Background image */}
-      <Image
+      <img
         src="/car-rental-app.jpg"
         alt="Campus background"
-        fill
-        priority
-        className="object-cover object-center z-0"
-        unoptimized
+        style={{ position: 'absolute', width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}
       />
       {/* Overlay for darkening background for readability */}
       <div className="absolute inset-0 bg-black/30 z-10" />
@@ -71,13 +68,12 @@ export default function RegisterPage() {
           ">
           {/* Branding */}
           <div className="flex items-center space-x-3 mb-6">
-            <Image 
-              src="/spartan_logo.png" 
-              alt="Sparta Logo" 
-              width={48} 
-              height={48} 
-              priority
-              unoptimized
+            <img
+              src="/spartan_logo.png"
+              alt="Sparta Logo"
+              width={48}
+              height={48}
+              style={{ display: 'block' }}
             />
             <div>
               <h1 className="text-lg font-bold text-red-700">UNIVERSITY BIKE RENTAL</h1>
