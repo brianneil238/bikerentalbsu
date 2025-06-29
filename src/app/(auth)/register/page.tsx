@@ -52,29 +52,38 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col font-sans">
-      <header className="bg-white">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center space-x-3">
-            <Image src="/spartan_logo.png" alt="BSU Logo" width={50} height={50} />
+    <div className="min-h-screen w-full relative flex items-center justify-end bg-gray-100 font-sans overflow-hidden">
+      {/* Background image */}
+      <Image
+        src="/CAR RENTAL APP.jpg"
+        alt="Campus background"
+        fill
+        priority
+        className="object-cover object-center z-0"
+        unoptimized
+      />
+      {/* Overlay for darkening background for readability */}
+      <div className="absolute inset-0 bg-black/30 z-10" />
+      {/* Register card */}
+      <main className="relative z-20 flex items-center justify-end w-full h-screen">
+        <div className="w-full max-w-md mr-8 lg:mr-24 bg-white/80 backdrop-blur-md rounded-xl shadow-2xl p-8 flex flex-col
+          self-center
+          ">
+          {/* Branding */}
+          <div className="flex items-center space-x-3 mb-6">
+            <Image 
+              src="/spartan_logo.png" 
+              alt="Sparta Logo" 
+              width={48} 
+              height={48} 
+              priority
+              unoptimized
+            />
             <div>
-              <h1 className="text-lg font-bold text-red-700">SPARTA</h1>
-              <p className="text-xs text-gray-600">BATANGAS STATE UNIVERSITY - TNEU</p>
+              <h1 className="text-lg font-bold text-red-700">UNIVERSITY BIKE RENTAL</h1>
+              <p className="text-sm text-gray-700 font-medium">Rent. Ride. Return. Spartan-style.</p>
             </div>
           </div>
-        </div>
-      </header>
-
-      <div className="bg-white py-4 shadow-sm">
-        <h2 className="text-center text-2xl font-bold text-gray-800 tracking-wide">University Bike Rental</h2>
-      </div>
-
-      <div className="bg-blue-600 py-2">
-        <p className="text-center text-white text-sm">Spartan&apos;s Pedal Access & Rental Transport Assistant</p>
-      </div>
-
-      <main className="flex-grow flex items-center justify-center py-10">
-        <div className="w-full max-w-sm">
           <div className="bg-white p-6 rounded-md shadow-md">
             <h3 className="text-lg font-semibold mb-2 text-gray-800">Create your account</h3>
             <p className="text-sm text-gray-600 mb-6">
