@@ -40,7 +40,7 @@ export function Navigation() {
           {/* Logo */}
           <Link href="/" className="flex items-center text-xl font-bold text-red-700 hover:text-red-800 transition-colors">
             <Image 
-              src="/spartan_logo.png" 
+              src="/logo.png" 
               alt="Sparta Logo" 
               width={40} 
               height={40} 

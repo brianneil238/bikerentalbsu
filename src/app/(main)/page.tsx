@@ -10,7 +10,7 @@ export default function HomePage() {
       <section
         className="relative flex flex-col items-center justify-center min-h-screen py-10 w-full"
         style={{
-          backgroundImage: "url('/hero-bg.png')",
+          backgroundImage: "url('/bg.jpg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -21,7 +21,7 @@ export default function HomePage() {
         <div className="relative z-10 flex flex-col items-center w-full">
           {/* Logo and University Name */}
           <div className="flex flex-col items-center mb-6">
-            <Image src="/spartan_logo.png" alt="Sparta Logo" width={60} height={60} priority unoptimized />
+            <Image src="/logo.png" alt="Sparta Logo" width={60} height={60} priority unoptimized />
             <h1 className="text-2xl font-bold text-red-700 mt-2 drop-shadow">SPARTA</h1>
             <span className="text-base text-gray-100 tracking-wide drop-shadow">BATANGAS STATE UNIVERSITY - TNEU</span>
           </div>

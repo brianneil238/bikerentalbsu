@@ -55,7 +55,7 @@ export default function RegisterPage() {
     <div className="min-h-screen w-full relative flex items-center justify-end bg-gray-100 font-sans overflow-hidden">
       {/* Background image */}
       <img
-        src="/car-rental-app.jpg"
+        src="/bg.jpg"
         alt="Campus background"
         style={{ position: 'absolute', width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}
       />
@@ -69,7 +69,7 @@ export default function RegisterPage() {
           {/* Branding */}
           <div className="flex items-center space-x-3 mb-6">
             <img
-              src="/spartan_logo.png"
+              src="/logo.png"
               alt="Sparta Logo"
               width={48}
               height={48}

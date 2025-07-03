@@ -1142,14 +1142,6 @@ video {
 .bg-opacity-90 {
   --tw-bg-opacity: 0.9;
 }
-.object-cover {
-  -o-object-fit: cover;
-     object-fit: cover;
-}
-.object-center {
-  -o-object-position: center;
-     object-position: center;
-}
 .p-3 {
   padding: 0.75rem;
 }
