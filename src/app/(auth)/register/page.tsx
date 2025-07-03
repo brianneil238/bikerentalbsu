@@ -70,7 +70,7 @@ export default function RegisterPage() {
           <div className="flex items-center space-x-3 mb-6">
             <img
               src="/logo.png"
-              alt="Sparta Logo"
+              alt="Spartan Logo"
               width={48}
               height={48}
               style={{ display: 'block' }}

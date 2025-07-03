@@ -74,7 +74,7 @@ function LoginForm() {
     <div className="min-h-screen w-full relative flex items-center justify-end bg-gray-100 font-sans overflow-hidden">
       {/* Background image */}
       <img
-        src="/bgjpg"
+        src="/bg.jpg"
         alt="Campus background"
         style={{ position: 'absolute', width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}
       />
@@ -89,7 +89,7 @@ function LoginForm() {
           <div className="flex items-center space-x-3 mb-6">
             <img
               src="/logo.png"
-              alt="Sparta Logo"
+              alt="Spartan Logo"
               width={48}
               height={48}
               style={{ display: 'block' }}
